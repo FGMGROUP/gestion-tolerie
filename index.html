@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>TÔLERIE — Gestion de stock</title>
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIlTDtGxlcmllIOKAlCBHZXN0aW9uIGRlIHN0b2NrIiwgInNob3J0X25hbWUiOiAiVMO0bGVyaWUiLCAiZGVzY3JpcHRpb24iOiAiR2VzdGlvbiBkdSBzdG9jayBkZSB0w7RsZXMsIGRlcyB6b25lcyBkZSBzdG9ja2FnZSBldCBzY2FubmVyIFFSLiIsICJzdGFydF91cmwiOiAiLiIsICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLCAiYmFja2dyb3VuZF9jb2xvciI6ICIjMTQxNzFhIiwgInRoZW1lX2NvbG9yIjogIiMxNDE3MWEiLCAib3JpZW50YXRpb24iOiAicG9ydHJhaXQtcHJpbWFyeSIsICJpY29ucyI6IFt7InNyYyI6ICJkYXRhOmltYWdlL3BuZztiYXNlNjQsaVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQWdBQUFBSUFDQUlBQUFCN0drT3RBQUFJcVVsRVFWUjRuTzNZc1cwVVFSU0E0VDNrRWc2ZGRDSE4wQVlaTVFFSklrUWtCTVJrdEVFek5FQVRCRVlHYkdFQlB0L2N6UDk5RlR6dDdMeC90YnY5NGJnQjBQTms5QUFBakNFQUFGRUNBQkFsQUFCUkFnQVFKUUFBVVFJQUVDVUFBRkVDQUJBbEFBQlJBZ0FRSlFBQVVRSUFFQ1VBQUZFQ0FCQWxBQUJSQWdBUUpRQUFVUUlBRUNVQUFGRUNBQkFsQUFCUkFnQVFKUUFBVVFJQUVDVUFBRkVDQUJBbEFBQlJBZ0FRSlFBQVVRSUFFQ1VBQUZFQ0FCQWxBQUJSQWdBUUpRQUFVUUlBRUNVQUFGRUNBQkFsQUFCUkFnQVFKUUFBVVFJQUVDVUFBRkVDQUJBbEFBQlJBZ0FRSlFBQVVRSUFFQ1VBQUZFQ0FCQWxBQUJSQWdBUUpRQUFVUUlBRUNVQUFGRUNBQkFsQUFCUkFnQVFKUUFBVVFJQUVDVUFBRkVDQUJBbEFBQlJBZ0FRSlFBQVVRSUFFQ1VBQUZFQ0FCQWxBQUJSQWdBUUpRQUFVUUlBRUNVQUFGRUNBQkFsQUFCUkFnQVFKUUFBVVFJQUVDVUFBRkVDQUJBbEFBQlJBZ0FRSlFBQVVRSUFFQ1VBQUZFQ0FCQWxBQUJSQWdBUUpRQUFVUUlBRUNVQUFGRUNBQkFsQUFCUkFnQVFKUUFBVVFJQUVDVUFBRkVDQUJBbEFBQlJBZ0FRSlFBQVVRSUFFQ1VBQUZFQ0FCQWxBQUJSQWdBUUpRQUFVUUlBRUNVQUFGRUNBQkFsQUFCUkFnQVFKUUFBVVFJQUVDVUFBRkVDQUJBbEFBQlJBZ0FRSlFBQVVRSUFFQ1VBQUZFQ0FCQWxBQUJSQWdBUUpRQUFVUUlBRUNVQUFGRUNBQkFsQUFCUkFnQVFKUUFBVVFJQUVDVUFBRkVDQUJBbEFBQlJBZ0FRSlFBQVVRSUFFQ1VBQUZFQ0FCQWxBQUJSQWdBUUpRQUFVUUlBRUNVQUFGRUNBQkFsQUFCUkFnQVFKUUFBVVFJQUVDVUFBRkVDQUJBbEFBQlJBZ0FRSlFBQVVWZWpCN2hjWHo5L0d6MENjQUxQWGp3ZFBjS0YydTBQeDlFelhCeXJIOVlqQTNmNUJYU2I3UTlMY3JYdkVvRGZlRVZnWVM3NExRTHdrNWNEbHVlYS8wb0FmdkJhUUlUTGZrTUFBS0lFWU50OEVVQ01LMzlOQUFDaUJBQWdTZ0FBb2dRQUlFb0FBS0lFQUNCS0FBQ2lCQUFnU2dBQW9nUUFJRW9BQUtJRUFDQktBQUNpQkFBZ1NnQUFvZ1FBSUVvQUFLSUVBQ0JLQUFDaUJBQWdTZ0FBb2dRQUlFb0FBS0lFQUNCS0FBQ2lCQUFnU2dBQW9nUUFJRW9BQUtJRUFDQktBQUNpQkFBZ1NnQzJiZHVldlhnNmVnVGdmRno1YXdJQUVDVUFQL2dpZ0FpWC9ZWUEvT1MxZ09XNTVyOFNnTjk0T1dCaEx2Z3RBbkNiVndTVzVHcmZ0ZHNmanFObnVGQmZQMzhiUFFKd0FsYi9ud2dBUUpSZlFBQlJBZ0FRSlFBQVVRSUFFQ1VBQUZFQ0FCQWxBQUJSQWdBUUpRQUFVUUlBRUNVQUFGRUNBQkFsQUFCUkFnQVFKUUFBVVFJQUVDVUFBRkVDQUJBbEFBQlJBZ0FRSlFBQVVRSUFFQ1VBQUZFQ0FCQWxBQUJSQWdBUUpRQUFVUUlBRUhVMWVvQ3pldi9oNCtnUmdJdjI1dldyMFNPY3oyNS9PSTZlNFJ5c2Z1RHZSVEtRK0FWayt3UC9KTEkwMWc5QTVDQ0IweXFzanNVRFVEaEM0SkVzdjBCV0RzRHlod2M4dHJYWHlNb0JBT0FleXdaZzdXNERaN1B3TWxrMkFBRGNUd0FBb2dRQUlFb0FBS0lFQUNCS0FBQ2lCQUFnU2dBQW9nUUFJRW9BQUtJRUFDQktBQUNpQkFBZ1NnQUFvZ1FBSUVvQUFLSUVBQ0JLQUFDaUJBQWdTZ0FBb2dRQUlFb0FBS0lFQUNCS0FBQ2lCQUFnU2dBQW9nUUFJRW9BQUtJRUFDQktBQUNpQkFBZ1NnQUFvcFlOd0p2WHIwYVBBS3hnNFdXeWJBQUF1Ti9LQVZpNDI4QjVyTDFHVmc3QXR2cmhBWTlxK1FXeWVBQzJ3QkVDajZHd090WVB3Tlk0U09DRUlrdGp0ejhjUjg5d1B1OC9mQnc5QW5EUklxdi9XaXNBQU54SS9BSUM0QzRCQUlnU0FJQW9BUUNJRWdDQUtBRUFpQklBZ0NnQkFJZ1NBSUFvQVFDSUVnQ0FLQUVBaUJJQWdDZ0JBSWdTQUlBb0FRQ0lFZ0NBS0FFQWlCSUFnQ2dCQUlnU0FJQW9BUUNJRWdDQUtBRUFpQklBZ0NnQkFJZ1NBSUFvQVFDSXVobzl3RU05Zi90cDlBaEExSmQzTDBlUDhDQzcvZUU0ZW9iL1pQVURsMkRlRE16NkM4ajJCeTdFdk90b3lnRE0rN2lCSlUyNmxPWUx3S1FQR2xqYmpLdHBzZ0RNK0lpQmlPa1cxR1FCQU9CVVpnckFkSFVGYXVaYVV6TUZBSUFURWdDQUtBRUFpQklBZ0NnQkFJZ1NBSUFvQVFDSUVnQ0FLQUVBaUJJQWdDZ0JBSWdTQUlBb0FRQ0lFZ0NBS0FFQWlCSUFnQ2dCQUlnU0FJQW9BUUNJRWdDQUtBRUFpQklBZ0NnQkFJZ1NBSUFvQVFDSUVnQ0FLQUVBaUJJQWdDZ0JBSWdTQUlBb0FRQ0lFZ0NBcUprQzhPWGR5OUVqQU54bnJqVTFVd0FBT0tISkFqQlhYWUdVNlJiVVpBSFlKbnpFUU1HTXEybStBR3h6UG1oZ1laTXVwU2tEc0UzN3VJSDF6THVPZHZ2RGNmUU1EL0w4N2FmUkl3QlI4NjcrYTlNSEFJRC9NK3N2SUFBZVNBQUFvZ1FBSUVvQUFLSUVBQ0JLQUFDaUJBQWdTZ0FBb2dRQUlFb0FBS0lFQUNCS0FBQ2lCQUFnU2dBQW9nUUFJRW9BQUtJRUFDQktBQUNpQkFBZ1NnQUFvZ1FBSUVvQUFLSUVBQ0JLQUFDaUJBQWdTZ0FBb2dRQUlFb0FBS0lFQUNCS0FBQ2lCQUFnU2dBQW9nUUFJRW9BQUtJRUFDQktBQUNpQkFBZ1NnQUFvZ1FBSUVvQUFLSUVBQ0JLQUFDaUJBQWdTZ0FBb2dRQUlFb0FBS0lFQUNCS0FBQ2lCQUFnU2dBQW9nUUFJRW9BQUtJRUFDQktBQUNpQkFBZ1NnQUFvZ1FBSUVvQUFLSUVBQ0JLQUFDaUJBQWdTZ0FBb2dRQUlFb0FBS0lFQUNCS0FBQ2lCQUFnU2dBQW9nUUFJRW9BQUtJRUFDQktBQUNpQkFBZ1NnQUFvZ1FBSUVvQUFLSUVBQ0JLQUFDaUJBQWdTZ0FBb2dRQUlFb0FBS0lFQUNCS0FBQ2lCQUFnU2dBQW9nUUFJRW9BQUtJRUFDQktBQUNpQkFBZ1NnQUFvZ1FBSUVvQUFLSUVBQ0JLQUFDaUJBQWdTZ0FBb2dRQUlFb0FBS0lFQUNCS0FBQ2lCQUFnU2dBQW9nUUFJRW9BQUtJRUFDQktBQUNpQkFBZ1NnQUFvZ1FBSUVvQUFLSUVBQ0JLQUFDaUJBQWdTZ0FBb2dRQUlFb0FBS0lFQUNCS0FBQ2lCQUFnU2dBQW9nUUFJRW9BQUtJRUFDQktBQUNpQkFBZ1NnQUFvZ1FBSUVvQUFLSUVBQ0JLQUFDaUJBQWdTZ0FBb2dRQUlFb0FBS0lFQUNCS0FBQ2lCQUFnU2dBQW9nUUFJRW9BQUtJRUFDQktBQUNpQkFBZ1NnQUFvZ1FBSUVvQUFLSUVBQ0JLQUFDaUJBQWdTZ0FBb2dRQUlFb0FBS0lFQUNEcU95QVdlNis2TnRCUkFBQUFBRWxGVGtTdVFtQ0MiLCAic2l6ZXMiOiAiNTEyeDUxMiIsICJ0eXBlIjogImltYWdlL3BuZyIsICJwdXJwb3NlIjogImFueSBtYXNrYWJsZSJ9XX0=">
+<meta name="theme-color" content="#14171a">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAIAAAB7GkOtAAAIqUlEQVR4nO3YsW0UQRSA4T3kEg6ddCHN0AYZMQEJIkQkBMRktEEzNEATBEYGbGEBPt/czP99FTzt7Lx/tbv94bgB0PNk9AAAjCEAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUVejB7hcXz9/Gz0CcALPXjwdPcKF2u0Px9EzXByrH9YjA3f5BXSb7Q9LcrXvEoDfeEVgYS74LQLwk5cDluea/0oAfvBaQITLfkMAAKIEYNt8EUCMK39NAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgC2bduevXg6egTgfFz5awIAECUAP/gigAiX/YYA/OS1gOW55r8SgN94OWBhLvgtAnCbVwSW5GrftdsfjqNnuFBfP38bPQJwAlb/nwgAQJRfQABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAEHU1eoCzev/h4+gRgIv25vWr0SOcz25/OI6e4RysfuDvRTKQ+AVk+wP/JLI01g9A5CCB0yqsjsUDUDhC4JEsv0BWDsDyhwc8trXXyMoBAOAeywZg7W4DZ7PwMlk2AADcTwAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAopYNwJvXr0aPAKxg4WWybAAAuN/KAVi428B5rL1GVg7AtvrhAY9q+QWyeAC2wBECj6GwOtYPwNY4SOCEIktjtz8cR89wPu8/fBw9AnDRIqv/WisAANxI/AIC4C4BAIgSAIAoAQCIEgCAKAEAiBIAgCgBAIgSAIAoAQCIEgCAKAEAiBIAgCgBAIgSAIAoAQCIEgCAKAEAiBIAgCgBAIgSAIAoAQCIEgCAKAEAiBIAgCgBAIgSAIAoAQCIuho9wEM9f/tp9AhA1Jd3L0eP8CC7/eE4eob/ZPUDl2DeDMz6C8j2By7EvOtoygDM+7iBJU26lOYLwKQPGljbjKtpsgDM+IiBiOkW1GQBAOBUZgrAdHUFauZaUzMFAIATEgCAKAEAiBIAgCgBAIgSAIAoAQCIEgCAKAEAiBIAgCgBAIgSAIAoAQCIEgCAKAEAiBIAgCgBAIgSAIAoAQCIEgCAKAEAiBIAgCgBAIgSAIAoAQCIEgCAKAEAiBIAgCgBAIgSAIAoAQCIEgCAqJkC8OXdy9EjANxnrjU1UwAAOKHJAjBXXYGU6RbUZAHYJnzEQMGMq2m+AGxzPmhgYZMupSkDsE37uIH1zLuOdvvDcfQMD/L87afRIwBR867+a9MHAID/M+svIAAeSAAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACDqOyAWe6+6NtBRAAAAAElFTkSuQmCC">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAIAAAB7GkOtAAAIqUlEQVR4nO3YsW0UQRSA4T3kEg6ddCHN0AYZMQEJIkQkBMRktEEzNEATBEYGbGEBPt/czP99FTzt7Lx/tbv94bgB0PNk9AAAjCEAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUVejB7hcXz9/Gz0CcALPXjwdPcKF2u0Px9EzXByrH9YjA3f5BXSb7Q9LcrXvEoDfeEVgYS74LQLwk5cDluea/0oAfvBaQITLfkMAAKIEYNt8EUCMK39NAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgC2bduevXg6egTgfFz5awIAECUAP/gigAiX/YYA/OS1gOW55r8SgN94OWBhLvgtAnCbVwSW5GrftdsfjqNnuFBfP38bPQJwAlb/nwgAQJRfQABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAECUAAFECABAlAABRAgAQJQAAUQIAEHU1eoCzev/h4+gRgIv25vWr0SOcz25/OI6e4RysfuDvRTKQ+AVk+wP/JLI01g9A5CCB0yqsjsUDUDhC4JEsv0BWDsDyhwc8trXXyMoBAOAeywZg7W4DZ7PwMlk2AADcTwAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAopYNwJvXr0aPAKxg4WWybAAAuN/KAVi428B5rL1GVg7AtvrhAY9q+QWyeAC2wBECj6GwOtYPwNY4SOCEIktjtz8cR89wPu8/fBw9AnDRIqv/WisAANxI/AIC4C4BAIgSAIAoAQCIEgCAKAEAiBIAgCgBAIgSAIAoAQCIEgCAKAEAiBIAgCgBAIgSAIAoAQCIEgCAKAEAiBIAgCgBAIgSAIAoAQCIEgCAKAEAiBIAgCgBAIgSAIAoAQCIuho9wEM9f/tp9AhA1Jd3L0eP8CC7/eE4eob/ZPUDl2DeDMz6C8j2By7EvOtoygDM+7iBJU26lOYLwKQPGljbjKtpsgDM+IiBiOkW1GQBAOBUZgrAdHUFauZaUzMFAIATEgCAKAEAiBIAgCgBAIgSAIAoAQCIEgCAKAEAiBIAgCgBAIgSAIAoAQCIEgCAKAEAiBIAgCgBAIgSAIAoAQCIEgCAKAEAiBIAgCgBAIgSAIAoAQCIEgCAKAEAiBIAgCgBAIgSAIAoAQCIEgCAqJkC8OXdy9EjANxnrjU1UwAAOKHJAjBXXYGU6RbUZAHYJnzEQMGMq2m+AGxzPmhgYZMupSkDsE37uIH1zLuOdvvDcfQMD/L87afRIwBR867+a9MHAID/M+svIAAeSAAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACBKAACiBAAgSgAAogQAIEoAAKIEACDqOyAWe6+6NtBRAAAAAElFTkSuQmCC">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tôlerie">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+<style>
+  :root{
+    --bg:#14171a;
+    --panel:#1c2024;
+    --panel-2:#22262b;
+    --line:#333a41;
+    --ink:#e9e7e2;
+    --ink-dim:#9aa2a9;
+    --accent:#f2b705;
+    --accent-ink:#14171a;
+    --blue:#5b93b3;
+    --danger:#c1443c;
+    --danger-bg:#2a1c1b;
+    --ok:#5fa06a;
+    --radius:3px;
+    --display:'Oswald',sans-serif;
+    --body:'IBM Plex Sans',sans-serif;
+    --mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--body);}
+  body{display:flex;min-height:100vh;}
+  ::selection{background:var(--accent);color:var(--accent-ink);}
+
+  /* Ruler signature strip */
+  #ruler{
+    width:18px;flex:0 0 18px;height:100vh;position:sticky;top:0;
+    background:
+      repeating-linear-gradient(to bottom,
+        var(--accent) 0px, var(--accent) 1px, transparent 1px, transparent 10px),
+      repeating-linear-gradient(to bottom,
+        var(--accent) 0px, var(--accent) 1px, transparent 1px, transparent 50px);
+    background-size: 6px 10px, 12px 50px;
+    background-position: right, right;
+    background-repeat: repeat-y;
+    border-right:1px solid var(--line);
+    opacity:.75;
+  }
+
+  #sidebar{
+    width:220px;flex:0 0 220px;background:var(--panel);border-right:1px solid var(--line);
+    display:flex;flex-direction:column;padding:22px 16px;position:sticky;top:0;height:100vh;
+  }
+  .brand{font-family:var(--display);font-weight:600;font-size:20px;letter-spacing:.5px;line-height:1.15;color:var(--ink);}
+  .brand span{color:var(--accent);}
+  .brand-sub{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);letter-spacing:1px;margin-top:6px;text-transform:uppercase;}
+  nav{margin-top:34px;display:flex;flex-direction:column;gap:4px;}
+  .nav-btn{
+    font-family:var(--display);font-size:14px;letter-spacing:.5px;text-transform:uppercase;
+    text-align:left;background:none;border:none;color:var(--ink-dim);padding:11px 10px;border-radius:var(--radius);
+    cursor:pointer;display:flex;align-items:center;gap:10px;border-left:3px solid transparent;
+  }
+  .nav-btn .num{font-family:var(--mono);font-size:11px;color:var(--ink-dim);}
+  .nav-btn:hover{color:var(--ink);background:var(--panel-2);}
+  .nav-btn.active{color:var(--ink);background:var(--panel-2);border-left-color:var(--accent);}
+  .nav-btn.active .num{color:var(--accent);}
+  .sidebar-foot{margin-top:auto;font-family:var(--mono);font-size:10px;color:var(--ink-dim);line-height:1.6;border-top:1px solid var(--line);padding-top:12px;}
+  .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ok);margin-right:6px;}
+
+  main{flex:1;padding:36px 44px;max-width:1180px;}
+  header.page{margin-bottom:28px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;}
+  h1{font-family:var(--display);font-weight:600;font-size:28px;margin:0;letter-spacing:.3px;}
+  .eyebrow{font-family:var(--mono);font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;}
+  .lede{color:var(--ink-dim);font-size:13.5px;margin-top:6px;max-width:520px;}
+
+  button{font-family:var(--body);cursor:pointer;}
+  .btn{
+    background:var(--panel-2);color:var(--ink);border:1px solid var(--line);padding:9px 16px;border-radius:var(--radius);
+    font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn:hover{border-color:var(--ink-dim);}
+  .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600;}
+  .btn.primary:hover{filter:brightness(1.08);}
+  .btn.danger{color:var(--danger);border-color:var(--danger);background:transparent;}
+  .btn.danger:hover{background:var(--danger-bg);}
+  .btn.ghost{background:transparent;border-color:transparent;color:var(--ink-dim);padding:6px 8px;}
+  .btn.ghost:hover{color:var(--ink);}
+  .btn.small{padding:5px 10px;font-size:12px;}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:center;}
+  input[type=text],input[type=number],select,textarea{
+    background:var(--panel-2);border:1px solid var(--line);color:var(--ink);padding:9px 11px;border-radius:var(--radius);
+    font-family:var(--body);font-size:13px;
+  }
+  input[type=text]:focus,input[type=number]:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent);}
+  .search{min-width:220px;}
+  label{font-size:11.5px;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:5px;}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  thead th{
+    text-align:left;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;
+    color:var(--ink-dim);border-bottom:1px solid var(--line);padding:0 12px 10px;font-weight:500;
+  }
+  tbody td{padding:13px 12px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  tbody tr:hover{background:var(--panel-2);}
+  .ref{font-family:var(--mono);font-weight:600;letter-spacing:.3px;}
+  .dim{font-family:var(--mono);color:var(--ink-dim);font-size:12.5px;}
+  .zone-pill{
+    font-family:var(--mono);font-size:11.5px;background:var(--panel-2);border:1px solid var(--line);
+    padding:3px 9px;border-radius:20px;color:var(--blue);white-space:nowrap;
+  }
+  .qty-ctrl{display:flex;align-items:center;gap:8px;}
+  .qty-ctrl button{width:24px;height:24px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;}
+  .qty-ctrl button:hover{border-color:var(--accent);color:var(--accent);}
+  .qty-val{font-family:var(--mono);min-width:24px;text-align:center;font-weight:600;}
+  .qty-low .qty-val{color:var(--danger);}
+  .row-actions{display:flex;gap:4px;justify-content:flex-end;}
+
+  .empty{
+    border:1px dashed var(--line);border-radius:var(--radius);padding:46px 24px;text-align:center;color:var(--ink-dim);
+  }
+  .empty b{color:var(--ink);display:block;font-family:var(--display);font-size:16px;margin-bottom:6px;font-weight:500;}
+
+  /* Zones grid — hazard tag style */
+  .zones-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
+  .tag{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+    display:flex;flex-direction:column;
+  }
+  .tag-stripe{
+    height:8px;width:100%;
+    background:repeating-linear-gradient(-45deg,var(--accent),var(--accent) 8px,#1a1a1a 8px,#1a1a1a 16px);
+  }
+  .tag-body{padding:16px;display:flex;flex-direction:column;gap:10px;}
+  .tag-code{font-family:var(--mono);font-size:22px;font-weight:600;letter-spacing:1px;}
+  .tag-name{color:var(--ink-dim);font-size:13px;margin-top:-6px;}
+  .tag-count{font-size:11.5px;color:var(--ink-dim);font-family:var(--mono);}
+  .tag-qr{display:flex;justify-content:center;padding:6px;background:#fff;border-radius:2px;width:fit-content;}
+  .tag-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px;}
+
+  /* Scanner viewfinder */
+  .scanner-wrap{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start;}
+  .viewfinder{
+    position:relative;width:340px;height:340px;background:#000;border-radius:var(--radius);overflow:hidden;
+    flex:0 0 auto;
+  }
+  .viewfinder video{width:100%;height:100%;object-fit:cover;display:block;}
+  .viewfinder .corner{position:absolute;width:28px;height:28px;border:3px solid var(--accent);}
+  .corner.tl{top:14px;left:14px;border-right:none;border-bottom:none;}
+  .corner.tr{top:14px;right:14px;border-left:none;border-bottom:none;}
+  .corner.bl{bottom:14px;left:14px;border-right:none;border-top:none;}
+  .corner.br{bottom:14px;right:14px;border-left:none;border-top:none;}
+  .viewfinder .idle{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;
+    color:var(--ink-dim);font-size:13px;text-align:center;padding:20px;
+  }
+  .scan-line{position:absolute;left:14px;right:14px;height:2px;background:var(--accent);box-shadow:0 0 8px var(--accent);top:50%;animation:scanmove 2.2s ease-in-out infinite;}
+  @keyframes scanmove{0%{top:16%;}50%{top:84%;}100%{top:16%;}}
+  .scan-panel{flex:1;min-width:280px;}
+  .result-card{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
+  .result-card.found{border-color:var(--ok);}
+  .result-card.notfound{border-color:var(--danger);}
+  .manual-scan{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);}
+  .manual-scan .row{display:flex;gap:8px;margin-top:8px;}
+
+  /* Modal */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-start;justify-content:center;padding:60px 20px;overflow:auto;z-index:50;}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);width:100%;max-width:520px;padding:26px 28px;}
+  .modal h2{font-family:var(--display);font-weight:500;font-size:19px;margin:0 0 18px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  .field{display:flex;flex-direction:column;margin-bottom:14px;}
+  .field input,.field select,.field textarea{width:100%;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+
+  .banner{
+    background:var(--panel-2);border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:var(--radius);
+    padding:10px 14px;font-size:12.5px;color:var(--ink-dim);margin-bottom:20px;
+  }
+  .toast{
+    position:fixed;bottom:24px;right:24px;background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:var(--radius);
+    font-size:13px;font-weight:500;z-index:100;opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none;
+  }
+  .toast.show{opacity:1;transform:translateY(0);}
+
+  #print-area{display:none;}
+  @media print{
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+    @page{ size: A4 landscape; margin: 10mm; }
+    html, body{ background:#fff !important; }
+    body > *{ display:none !important; }
+    #print-area{
+      display:flex !important;flex-direction:column;align-items:center;padding-top:6mm;
+      width:100%;height:95mm;box-sizing:border-box;border-bottom:1.5px dashed #999;margin:0;
+      overflow:hidden;
+    }
+    .print-tag{
+      border:3px solid #000;padding:8mm 12mm;width:100%;max-width:150mm;max-height:82mm;box-sizing:border-box;font-family:var(--mono);overflow:hidden;
+    }
+    .print-tag .pcode{font-size:26px;font-weight:700;margin-bottom:4px;line-height:1.1;word-break:break-word;}
+    .print-tag .pname{font-size:13px;margin-bottom:8px;color:#333;}
+    .print-tag table{font-size:12px !important;}
+    .print-tag table td{padding:3px 0 !important;}
+    .rack-print{width:100%;height:100%;display:flex;justify-content:center;}
+    .rack-strip{
+      width:100%;max-width:230mm;height:100%;border:2.5px solid #000;border-radius:4mm;overflow:hidden;
+      font-family:var(--mono);display:flex;flex-direction:column;box-sizing:border-box;
+    }
+    .rack-strip-title{
+      background:#fff;color:#000;text-align:center;font-weight:800;font-size:20px;
+      padding:2.5mm 2mm;border-bottom:2.5px solid #000;letter-spacing:1px;flex:0 0 auto;
+    }
+    .rack-strip-row{display:grid;flex:1;min-height:0;}
+    .rack-strip-shelf{
+      padding:2.5mm 2mm 2mm;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+      border-right:1.5px solid #000;height:100%;box-sizing:border-box;overflow:hidden;
+    }
+    .rack-strip-shelf:last-child{border-right:none;}
+    .rack-strip-band{display:flex;justify-content:center;align-items:center;margin-bottom:1mm;}
+    .rack-strip-band .letter{font-size:18px;font-weight:800;color:#111;}
+    .rack-strip-name{font-size:7.5px;font-weight:600;color:#222;margin:0.5mm 0 2mm;text-align:center;line-height:1.2;}
+    .rack-strip-qr-pill{background:#fff;border-radius:4mm;padding:1.5mm;display:flex;justify-content:center;}
+  }
+
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -2px;}
+  .table-wrap table{min-width:640px;}
+
+  @media (max-width:820px){
+    #ruler{display:none;}
+    body{flex-direction:column;}
+    #sidebar{
+      width:100%;flex:none;height:auto;position:sticky;top:0;z-index:40;
+      flex-direction:row;align-items:center;padding:12px 14px;gap:8px;
+    }
+    .brand{font-size:17px;}
+    .brand-sub{display:none;}
+    nav{margin-top:0;flex-direction:row;margin-left:auto;gap:2px;}
+    .nav-btn{padding:8px;font-size:0;gap:0;border-left:none;border-bottom:3px solid transparent;}
+    .nav-btn.active{border-left-color:transparent;border-bottom-color:var(--accent);}
+    .nav-btn .num{font-size:13px;}
+    .sidebar-foot{display:none;}
+    main{padding:18px 14px 90px;}
+    header.page{flex-direction:column;align-items:stretch;gap:14px;}
+    header.page .btn.primary{width:100%;justify-content:center;}
+    h1{font-size:22px;}
+    .toolbar{flex-direction:column;align-items:stretch;}
+    .toolbar > *{width:100%;}
+    .grid2,.grid3{grid-template-columns:1fr;}
+    .overlay{padding:0;align-items:flex-end;}
+    .modal{max-width:100%;border-radius:var(--radius) var(--radius) 0 0;max-height:92vh;overflow-y:auto;}
+    .zones-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
+    .scanner-wrap{flex-direction:column;align-items:stretch;}
+    .viewfinder{width:100%;max-width:420px;height:auto;aspect-ratio:1/1;margin:0 auto;}
+    .row-actions{flex-wrap:wrap;justify-content:flex-start;}
+  }
+
+  @media (max-width:420px){
+    .nav-btn .num{font-size:12px;}
+    h1{font-size:19px;}
+    .tag-code{font-size:18px;}
+  }
+
+  a{color:var(--blue);}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  /* Auth gate */
+  .auth-gate{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;z-index:200;}
+  .auth-box{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);width:100%;max-width:360px;padding:30px 28px;}
+  .auth-brand{font-family:var(--display);font-weight:600;font-size:20px;letter-spacing:.02em;margin-bottom:2px;}
+  .auth-brand span{color:var(--accent);}
+  .auth-sub{color:var(--ink-dim);font-size:12px;margin-bottom:22px;}
+  .auth-error{color:var(--danger);font-size:12px;margin:-6px 0 12px;}
+  .auth-switch{font-size:12px;color:var(--ink-dim);margin-top:16px;text-align:center;}
+  .auth-switch a{cursor:pointer;}
+  .user-chip{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--ink-dim);}
+  .user-chip button{background:none;border:none;color:var(--ink-dim);text-decoration:underline;cursor:pointer;font-size:11px;padding:0;}
+  .user-chip button:hover{color:var(--ink);}
+</style>
+</head>
+<body>
+
+<div id="auth-gate" class="auth-gate" style="display:none"></div>
+
+<div id="ruler" aria-hidden="true" style="display:none"></div>
+
+<div id="sidebar" style="display:none">
+  <div class="brand">TÔLE<span>RIE</span></div>
+  <div class="brand-sub">Gestion de stock</div>
+  <nav>
+    <button class="nav-btn active" data-tab="inventaire"><span class="num">01</span> Inventaire</button>
+    <button class="nav-btn" data-tab="zones"><span class="num">02</span> Zones</button>
+    <button class="nav-btn" data-tab="scanner"><span class="num">03</span> Scanner QR</button>
+  </nav>
+  <div class="sidebar-foot" id="sidebar-foot"><span class="dot"></span>Connexion…</div>
+</div>
+
+<main id="main-view" style="display:none">
+  <div id="view"></div>
+</main>
+
+<div id="print-area"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------------------------------------------------
+   DATA LAYER
+--------------------------------------------------------- */
+let toles = [];
+let zones = [];
+let currentTab = 'inventaire';
+
+/* ---------------------------------------------------------
+   🔧 CONFIGURATION — collez ici les valeurs de votre projet Firebase
+   (Console Firebase → ⚙️ Paramètres du projet → Vos applications → Config)
+--------------------------------------------------------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyDRmQ3QaMGj8jN0irDbexEs9bOLMca9GqE",
+  authDomain: "fgm-group-8962f.firebaseapp.com",
+  projectId: "fgm-group-8962f",
+  storageBucket: "fgm-group-8962f.firebasestorage.app",
+  messagingSenderId: "25272412888",
+  appId: "1:25272412888:web:70c990174309846d7f85ad"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+let serverIdSnapshots = {};
+
+const uid = () => Math.random().toString(36).slice(2,9);
+function formatDate(iso){
+  if(!iso) return '—';
+  const d = new Date(iso);
+  if(isNaN(d)) return '—';
+  const pad = n => String(n).padStart(2,'0');
+  return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+/* Référence automatique : MATIÈRE-NUANCE-ÉPAISSEURxLONGUEURxLARGEUR-SÉQUENCE */
+const MATIERE_CODES = {
+  'Acier':'AC', 'Acier galvanisé':'GA', 'Inox':'IX', 'Aluminium':'AL', 'Cuivre':'CU', 'Autre':'XX'
+};
+function slugPart(str){
+  return String(str||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^A-Z0-9]+/g,'').slice(0,12);
+}
+function buildRefBase(matiere, nuance, epaisseur, longueur, largeur){
+  const parts = [MATIERE_CODES[matiere] || 'XX'];
+  const n = slugPart(nuance);
+  if(n) parts.push(n);
+  const ep = String(epaisseur).replace('.', ',');
+  parts.push(`${ep}X${longueur}X${largeur}`);
+  return parts.join('-');
+}
+function generateRef(matiere, nuance, epaisseur, longueur, largeur, excludeId){
+  const base = buildRefBase(matiere, nuance, epaisseur, longueur, largeur);
+  const nums = toles
+    .filter(t => t.id !== excludeId && t.ref && t.ref.startsWith(base + '-'))
+    .map(t => { const m = t.ref.match(/-(\d{3,})$/); return m ? parseInt(m[1], 10) : 0; });
+  const next = nums.length ? Math.max(...nums) + 1 : 1;
+  return `${base}-${String(next).padStart(3,'0')}`;
+}
+
+async function loadData(){
+  try{
+    const snap = await db.collection('toles').get();
+    toles = snap.docs.map(d=>{
+      const data = d.data();
+      return {
+        id: uid(), _fbId: d.id,
+        ref: data.ref || '', matiere: data.matiere || 'Acier', nuance: data.nuance || '',
+        epaisseur: Number(data.epaisseur) || 0, longueur: Number(data.longueur) || 0, largeur: Number(data.largeur) || 0,
+        qte: Number(data.qte) || 0, seuil: Number(data.seuil) || 0, zone: data.zone || '',
+        dateCreation: data.dateCreation || null, dateModification: data.dateModification || null
+      };
+    });
+    serverIdSnapshots.toles = new Set(toles.map(t=>t._fbId));
+  }catch(e){ console.error(e); toles = []; toast('Impossible de charger le stock depuis Firebase'); }
+
+  try{
+    const zsnap = await db.collection('zones').get();
+    zones = zsnap.docs.map(d=>({ code: d.id, nom: d.data().nom || d.id }));
+    serverIdSnapshots.zones = new Set(zones.map(z=>z.code));
+  }catch(e){ console.error(e); zones = []; toast('Impossible de charger les zones depuis Firebase'); }
+}
+
+async function saveToles(){
+  try{
+    const currentIds = new Set(toles.filter(t=>t._fbId).map(t=>t._fbId));
+    const removed = [...(serverIdSnapshots.toles || new Set())].filter(id=>!currentIds.has(id));
+    for(const id of removed){ await db.collection('toles').doc(id).delete(); }
+    for(const t of toles){
+      const fields = {
+        ref: t.ref, matiere: t.matiere, nuance: t.nuance || '',
+        epaisseur: t.epaisseur, longueur: t.longueur, largeur: t.largeur,
+        qte: t.qte, seuil: t.seuil, zone: t.zone || '',
+        dateCreation: t.dateCreation || new Date().toISOString(),
+        dateModification: t.dateModification || new Date().toISOString()
+      };
+      if(t._fbId){
+        await db.collection('toles').doc(t._fbId).set(fields);
+      }else{
+        const ref = await db.collection('toles').add(fields);
+        t._fbId = ref.id;
+      }
+    }
+    serverIdSnapshots.toles = new Set(toles.filter(t=>t._fbId).map(t=>t._fbId));
+  }catch(e){ console.error(e); toast('Erreur de synchronisation Firebase — vérifiez la console'); }
+}
+
+async function saveZones(){
+  try{
+    const currentCodes = new Set(zones.map(z=>z.code));
+    const removed = [...(serverIdSnapshots.zones || new Set())].filter(c=>!currentCodes.has(c));
+    for(const c of removed){ await db.collection('zones').doc(c).delete(); }
+    for(const z of zones){ await db.collection('zones').doc(z.code).set({ nom: z.nom }); }
+    serverIdSnapshots.zones = new Set(currentCodes);
+  }catch(e){ console.error(e); toast('Erreur de synchronisation Firebase — vérifiez la console'); }
+}
+
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=> el.classList.remove('show'), 2400);
+}
+
+/* ---------------------------------------------------------
+   NAV
+--------------------------------------------------------- */
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    stopLiveScanner();
+    currentTab = btn.dataset.tab;
+    render();
+  });
+});
+
+function render(){
+  if(currentTab === 'inventaire') renderInventaire();
+  else if(currentTab === 'zones') renderZones();
+  else if(currentTab === 'scanner') renderScanner();
+}
+
+/* ---------------------------------------------------------
+   INVENTAIRE
+--------------------------------------------------------- */
+let invSearch = '';
+let invZoneFilter = '';
+let invNuanceFilter = '';
+let invEpFilter = '';
+
+function renderInventaire(){
+  const view = document.getElementById('view');
+  const filtered = toles.filter(t=>{
+    const matchSearch = !invSearch || (t.ref+t.matiere+(t.nuance||'')).toLowerCase().includes(invSearch.toLowerCase());
+    const matchZone = !invZoneFilter || t.zone === invZoneFilter;
+    const matchNuance = !invNuanceFilter || (t.nuance||'') === invNuanceFilter;
+    const matchEp = !invEpFilter || String(t.epaisseur) === invEpFilter;
+    return matchSearch && matchZone && matchNuance && matchEp;
+  });
+  const nuancesDispo = [...new Set(toles.map(t=>t.nuance).filter(Boolean))].sort();
+  const epaisseursDispo = [...new Set(toles.map(t=>t.epaisseur))].sort((a,b)=>a-b);
+
+  view.innerHTML = `
+    <header class="page">
+      <div>
+        <div class="eyebrow">Stock</div>
+        <h1>Inventaire des tôles</h1>
+        <div class="lede">${toles.length} référence(s) enregistrée(s) sur ${zones.length} zone(s) de rangement.</div>
+      </div>
+      <button class="btn primary" id="add-tole-btn">+ Ajouter une tôle</button>
+    </header>
+
+    <div class="toolbar">
+      <input type="text" class="search" id="inv-search" placeholder="Rechercher une référence ou une matière…" value="${escapeHtml(invSearch)}">
+      <select id="inv-zone-filter">
+        <option value="">Toutes les zones</option>
+        ${zones.map(z=>`<option value="${z.code}" ${invZoneFilter===z.code?'selected':''}>${z.code} — ${escapeHtml(z.nom)}</option>`).join('')}
+      </select>
+      <select id="inv-nuance-filter">
+        <option value="">Toutes les nuances</option>
+        ${nuancesDispo.map(n=>`<option value="${escapeHtml(n)}" ${invNuanceFilter===n?'selected':''}>${escapeHtml(n)}</option>`).join('')}
+      </select>
+      <select id="inv-ep-filter">
+        <option value="">Toutes les épaisseurs</option>
+        ${epaisseursDispo.map(ep=>`<option value="${ep}" ${invEpFilter===String(ep)?'selected':''}>${ep} mm</option>`).join('')}
+      </select>
+    </div>
+
+    ${filtered.length === 0 ? `
+      <div class="empty">
+        <b>${toles.length===0 ? 'Aucune tôle en stock' : 'Aucun résultat'}</b>
+        ${toles.length===0 ? 'Ajoutez votre première référence pour démarrer l\'inventaire.' : 'Essayez une autre recherche ou zone.'}
+      </div>
+    ` : `
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Référence</th><th>Matière</th><th>Nuance</th><th>Dimensions</th><th>Épaisseur</th>
+            <th>Zone</th><th>Quantité</th><th>Modifié le</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.map(t=>`
+            <tr class="${t.qte<=t.seuil ? 'qty-low':''}">
+              <td class="ref">${escapeHtml(t.ref)}</td>
+              <td>${escapeHtml(t.matiere)}</td>
+              <td class="dim">${t.nuance ? escapeHtml(t.nuance) : '—'}</td>
+              <td class="dim">${t.longueur}×${t.largeur} mm</td>
+              <td class="dim">${t.epaisseur} mm</td>
+              <td>${t.zone ? `<span class="zone-pill">${t.zone}</span>` : '<span class="dim">—</span>'}</td>
+              <td>
+                <div class="qty-ctrl">
+                  <button data-qty="-1" data-id="${t.id}" aria-label="Diminuer">−</button>
+                  <span class="qty-val">${t.qte}</span>
+                  <button data-qty="1" data-id="${t.id}" aria-label="Augmenter">+</button>
+                </div>
+              </td>
+              <td class="dim">${formatDate(t.dateModification)}</td>
+              <td>
+                <div class="row-actions">
+                  <button class="btn ghost small" data-edit="${t.id}">Modifier</button>
+                  <button class="btn ghost small" data-print-tole="${t.id}">Étiquette</button>
+                  <button class="btn ghost small" data-del="${t.id}">Suppr.</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      </div>
+    `}
+  `;
+
+  document.getElementById('add-tole-btn').onclick = ()=> openToleModal();
+  document.getElementById('inv-search').oninput = (e)=>{ invSearch = e.target.value; renderInventaire(); };
+  document.getElementById('inv-zone-filter').onchange = (e)=>{ invZoneFilter = e.target.value; renderInventaire(); };
+  document.getElementById('inv-nuance-filter').onchange = (e)=>{ invNuanceFilter = e.target.value; renderInventaire(); };
+  document.getElementById('inv-ep-filter').onchange = (e)=>{ invEpFilter = e.target.value; renderInventaire(); };
+
+  view.querySelectorAll('[data-qty]').forEach(b=>{
+    b.onclick = async ()=>{
+      const t = toles.find(x=>x.id===b.dataset.id);
+      t.qte = Math.max(0, t.qte + parseInt(b.dataset.qty));
+      t.dateModification = new Date().toISOString();
+      await saveToles();
+      renderInventaire();
+    };
+  });
+  view.querySelectorAll('[data-edit]').forEach(b=>{
+    b.onclick = ()=> openToleModal(toles.find(x=>x.id===b.dataset.edit));
+  });
+  view.querySelectorAll('[data-print-tole]').forEach(b=>{
+    b.onclick = ()=> printToleTag(toles.find(x=>x.id===b.dataset.printTole));
+  });
+  view.querySelectorAll('[data-del]').forEach(b=>{
+    b.onclick = async ()=>{
+      if(confirm('Supprimer cette référence du stock ?')){
+        toles = toles.filter(x=>x.id!==b.dataset.del);
+        await saveToles();
+        renderInventaire();
+      }
+    };
+  });
+}
+
+function openToleModal(existing, prefillZone){
+  const editing = !!existing;
+  const t = existing || { id: uid(), ref:'', matiere:'Acier', nuance:'', epaisseur:1, longueur:1000, largeur:1000, qte:1, seuil:1, zone: prefillZone || '' };
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <h2>${editing ? 'Modifier la tôle' : 'Ajouter une tôle'}</h2>
+      <div class="field">
+        <label>Référence <span style="text-transform:none;letter-spacing:0;color:var(--ink-dim);font-weight:400;">(générée automatiquement — modifiable)</span></label>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="f-ref" value="${escapeHtml(t.ref)}" style="flex:1">
+          <button type="button" class="btn small" id="regen-ref" title="Régénérer à partir de la nuance, l'épaisseur et les dimensions">↻ Régénérer</button>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Matière</label>
+          <select id="f-matiere">
+            ${['Acier','Acier galvanisé','Inox','Aluminium','Cuivre','Autre'].map(m=>`<option ${t.matiere===m?'selected':''}>${m}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field"><label>Épaisseur (mm)</label><input type="number" step="0.1" id="f-ep" value="${t.epaisseur}"></div>
+      </div>
+      <div class="field"><label>Nuance</label><input type="text" id="f-nuance" value="${escapeHtml(t.nuance||'')}" placeholder="Ex. S235JR, DX51D, 5754, 304L…"></div>
+      <div class="grid2">
+        <div class="field"><label>Longueur (mm)</label><input type="number" id="f-long" value="${t.longueur}"></div>
+        <div class="field"><label>Largeur (mm)</label><input type="number" id="f-larg" value="${t.largeur}"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Quantité</label><input type="number" id="f-qte" value="${t.qte}"></div>
+        <div class="field"><label>Seuil d'alerte</label><input type="number" id="f-seuil" value="${t.seuil}"></div>
+      </div>
+      <div class="field"><label>Zone de rangement</label>
+        <select id="f-zone">
+          <option value="">— Non affectée —</option>
+          ${zones.map(z=>`<option value="${z.code}" ${t.zone===z.code?'selected':''}>${z.code} — ${escapeHtml(z.nom)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="cancel-modal">Annuler</button>
+        <button class="btn primary" id="save-tole">Enregistrer</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.remove(); });
+  overlay.querySelector('#cancel-modal').onclick = ()=> overlay.remove();
+
+  const refInput = overlay.querySelector('#f-ref');
+  const matiereSel = overlay.querySelector('#f-matiere');
+  const nuanceInput = overlay.querySelector('#f-nuance');
+  const epInput = overlay.querySelector('#f-ep');
+  const longInput = overlay.querySelector('#f-long');
+  const largInput = overlay.querySelector('#f-larg');
+  let refManuallyEdited = editing && !!t.ref;
+
+  function recomputeRef(){
+    if(refManuallyEdited) return;
+    refInput.value = generateRef(
+      matiereSel.value, nuanceInput.value,
+      parseFloat(epInput.value) || 0,
+      parseInt(longInput.value) || 0,
+      parseInt(largInput.value) || 0,
+      editing ? t.id : null
+    );
+  }
+  [matiereSel, nuanceInput, epInput, longInput, largInput].forEach(el=>{
+    el.addEventListener('input', recomputeRef);
+  });
+  refInput.addEventListener('input', ()=>{ refManuallyEdited = true; });
+  overlay.querySelector('#regen-ref').addEventListener('click', ()=>{
+    refManuallyEdited = false;
+    recomputeRef();
+  });
+  if(!editing) recomputeRef();
+
+  overlay.querySelector('#save-tole').onclick = async ()=>{
+    const ref = overlay.querySelector('#f-ref').value.trim();
+    if(!ref){ toast('La référence est requise'); return; }
+    t.ref = ref;
+    t.matiere = overlay.querySelector('#f-matiere').value;
+    t.nuance = overlay.querySelector('#f-nuance').value.trim();
+    t.epaisseur = parseFloat(overlay.querySelector('#f-ep').value) || 0;
+    t.longueur = parseInt(overlay.querySelector('#f-long').value) || 0;
+    t.largeur = parseInt(overlay.querySelector('#f-larg').value) || 0;
+    t.qte = parseInt(overlay.querySelector('#f-qte').value) || 0;
+    t.seuil = parseInt(overlay.querySelector('#f-seuil').value) || 0;
+    t.zone = overlay.querySelector('#f-zone').value;
+    const now = new Date().toISOString();
+    if(!editing){
+      t.dateCreation = now;
+      t.dateModification = now;
+      toles.push(t);
+    }else{
+      t.dateModification = now;
+    }
+    await saveToles();
+    overlay.remove();
+    toast(editing ? 'Tôle mise à jour' : 'Tôle ajoutée');
+    render();
+  };
+}
+
+/* ---------------------------------------------------------
+   ZONES
+--------------------------------------------------------- */
+function deriveRack(code){
+  const m = String(code||'').match(/^[^\d]+/);
+  return (m ? m[0] : code).replace(/[-_\s]+$/,'') || code;
+}
+
+function renderZones(){
+  const view = document.getElementById('view');
+  const racks = [...new Set(zones.map(z=>deriveRack(z.code)))].sort();
+
+  view.innerHTML = `
+    <header class="page">
+      <div>
+        <div class="eyebrow">Rangement</div>
+        <h1>Zones de stockage</h1>
+        <div class="lede">Créez une zone, puis imprimez une étiquette groupée par rack (toutes les étagères sur une page A4).</div>
+      </div>
+      <button class="btn primary" id="add-zone-btn">+ Créer une zone</button>
+    </header>
+
+    ${racks.length > 0 ? `
+      <div class="toolbar">
+        <select id="rack-print-select">
+          ${racks.map(r=>`<option value="${escapeHtml(r)}">Rack ${escapeHtml(r)}</option>`).join('')}
+        </select>
+        <button class="btn" id="rack-print-btn">🖨 Imprimer l'étiquette du rack</button>
+      </div>
+    ` : ''}
+
+    ${zones.length === 0 ? `
+      <div class="empty">
+        <b>Aucune zone créée</b>
+        Ajoutez une zone (ex. "Rack A — Étagère 2") pour générer son étiquette QR à imprimer.
+      </div>
+    ` : `
+      <div class="zones-grid">
+        ${zones.map(z=>{
+          const count = toles.filter(t=>t.zone===z.code).reduce((s,t)=>s+t.qte,0);
+          const refs = toles.filter(t=>t.zone===z.code).length;
+          return `
+          <div class="tag">
+            <div class="tag-stripe"></div>
+            <div class="tag-body">
+              <div class="tag-code">${escapeHtml(z.code)}</div>
+              <div class="tag-name">${escapeHtml(z.nom)}</div>
+              <div class="tag-qr" id="qr-${z.code}"></div>
+              <div class="tag-count">${refs} référence(s) · ${count} unité(s)</div>
+              <div class="tag-actions">
+                <button class="btn small" data-view-zone="${z.code}">Voir contenu</button>
+                <button class="btn ghost small" data-del-zone="${z.code}">Suppr.</button>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    `}
+  `;
+
+  document.getElementById('add-zone-btn').onclick = openZoneModal;
+  const rackBtn = document.getElementById('rack-print-btn');
+  if(rackBtn){
+    rackBtn.onclick = ()=> printRackTag(document.getElementById('rack-print-select').value);
+  }
+
+  zones.forEach(z=>{
+    const holder = document.getElementById('qr-'+z.code);
+    if(holder && window.QRCode){
+      holder.innerHTML = '';
+      new QRCode(holder, { text: z.code, width: 96, height: 96, correctLevel: QRCode.CorrectLevel.M });
+    }
+  });
+
+  view.querySelectorAll('[data-view-zone]').forEach(b=>{
+    b.onclick = ()=>{
+      invZoneFilter = b.dataset.viewZone;
+      invSearch = '';
+      currentTab = 'inventaire';
+      document.querySelectorAll('.nav-btn').forEach(n=>n.classList.remove('active'));
+      document.querySelector('[data-tab="inventaire"]').classList.add('active');
+      renderInventaire();
+    };
+  });
+  view.querySelectorAll('[data-del-zone]').forEach(b=>{
+    b.onclick = async ()=>{
+      const used = toles.some(t=>t.zone===b.dataset.delZone);
+      if(used && !confirm('Des tôles sont affectées à cette zone. La supprimer quand même ?')) return;
+      zones = zones.filter(z=>z.code!==b.dataset.delZone);
+      await saveZones();
+      renderZones();
+    };
+  });
+}
+
+function openZoneModal(){
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <h2>Créer une zone de rangement</h2>
+      <div class="lede" style="margin:-8px 0 18px;">Renseignez soit Rack + Étagère (emplacement standard), soit "Autre" (emplacement particulier).</div>
+      <div class="grid2">
+        <div class="field"><label>Rack</label><input type="text" id="z-rack" placeholder="Ex. A"></div>
+        <div class="field"><label>Étagère</label><input type="text" id="z-etagere" placeholder="Ex. 1"></div>
+      </div>
+      <div class="field"><label>Autre (emplacement hors rack)</label><input type="text" id="z-autre" placeholder="Ex. Chutes, Extérieur, Zone réception…"></div>
+      <div class="banner" id="z-preview">Le code de zone sera généré automatiquement.</div>
+      <div class="modal-actions">
+        <button class="btn ghost" id="cancel-z">Annuler</button>
+        <button class="btn primary" id="save-z">Créer</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.remove(); });
+  overlay.querySelector('#cancel-z').onclick = ()=> overlay.remove();
+
+  const rackInput = overlay.querySelector('#z-rack');
+  const etagereInput = overlay.querySelector('#z-etagere');
+  const autreInput = overlay.querySelector('#z-autre');
+  const preview = overlay.querySelector('#z-preview');
+
+  function computeZone(){
+    const rack = rackInput.value.trim().toUpperCase();
+    const etagere = etagereInput.value.trim();
+    const autre = autreInput.value.trim();
+    if(autre){
+      return { code: slugPart(autre), nom: autre };
+    }
+    if(rack && etagere){
+      return { code: rack + etagere, nom: `Rack ${rack} — Étagère ${etagere}` };
+    }
+    if(rack){
+      return { code: rack, nom: `Rack ${rack}` };
+    }
+    return null;
+  }
+  function updatePreview(){
+    const z = computeZone();
+    preview.textContent = z ? `Code généré : ${z.code}  —  ${z.nom}` : 'Renseignez au moins Rack, ou Autre.';
+  }
+  [rackInput, etagereInput, autreInput].forEach(el=> el.addEventListener('input', updatePreview));
+
+  overlay.querySelector('#save-z').onclick = async ()=>{
+    const z = computeZone();
+    if(!z){ toast('Renseignez au moins Rack, ou Autre'); return; }
+    if(zones.some(x=>x.code===z.code)){ toast('Ce code de zone existe déjà'); return; }
+    zones.push(z);
+    await saveZones();
+    overlay.remove();
+    toast('Zone créée');
+    renderZones();
+  };
+}
+
+const RACK_STRIP_COLORS = ['#9ACD32', '#E5433B', '#9FC5E8', '#FDD835', '#4FB3A9', '#B388DB', '#FF9E6D', '#90A4AE'];
+
+function setPrintOrientation(orientation){
+  let style = document.getElementById('dynamic-page-style');
+  if(!style){
+    style = document.createElement('style');
+    style.id = 'dynamic-page-style';
+    document.head.appendChild(style);
+  }
+  style.textContent = `@media print { @page { size: A4 ${orientation}; margin: 10mm; } }`;
+}
+
+function printRackTag(rackName){
+  const shelves = zones.filter(z=>deriveRack(z.code) === rackName)
+    .sort((a,b)=> a.code.localeCompare(b.code, undefined, { numeric:true }));
+  if(shelves.length === 0) return;
+
+  setPrintOrientation('landscape');
+
+  const area = document.getElementById('print-area');
+  area.className = '';
+  area.innerHTML = `
+    <div class="rack-print">
+      <div class="rack-strip">
+        <div class="rack-strip-title">Rack ${escapeHtml(rackName)}</div>
+        <div class="rack-strip-row" style="grid-template-columns: repeat(${shelves.length}, 1fr);">
+        ${shelves.map((z, i)=>{
+          const color = RACK_STRIP_COLORS[i % RACK_STRIP_COLORS.length];
+          const offset = (i % 2 === 1) ? 'padding-top:14mm;' : '';
+          return `
+          <div class="rack-strip-shelf" style="background:${color};${offset}">
+            <div class="rack-strip-band">
+              <div class="letter">${escapeHtml(z.code)}</div>
+            </div>
+            <div class="rack-strip-name">${escapeHtml(z.nom)}</div>
+            <div class="rack-strip-qr-pill" id="rack-qr-${z.code}"></div>
+          </div>`;
+        }).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+  shelves.forEach(z=>{
+    new QRCode(document.getElementById('rack-qr-'+z.code), { text: z.code, width: 140, height: 140, correctLevel: QRCode.CorrectLevel.M });
+  });
+  setTimeout(()=> window.print(), 200);
+}
+
+function printToleTag(t){
+  if(!t) return;
+  setPrintOrientation('landscape');
+  const area = document.getElementById('print-area');
+  area.className = '';
+  area.innerHTML = `
+    <div class="print-tag">
+      <div class="pcode">${escapeHtml(t.ref)}</div>
+      <div class="pname">${escapeHtml(t.matiere)}${t.nuance ? ' · ' + escapeHtml(t.nuance) : ''}</div>
+      <table style="width:100%;font-size:19px;border-collapse:collapse;margin-top:16px;">
+        <tr><td style="padding:7px 0;color:#555;">Nuance</td><td style="padding:7px 0;text-align:right;font-weight:600;">${t.nuance ? escapeHtml(t.nuance) : '—'}</td></tr>
+        <tr><td style="padding:7px 0;color:#555;">Épaisseur</td><td style="padding:7px 0;text-align:right;font-weight:600;">${t.epaisseur} mm</td></tr>
+        <tr><td style="padding:7px 0;color:#555;">Dimensions</td><td style="padding:7px 0;text-align:right;font-weight:600;">${t.longueur}×${t.largeur} mm</td></tr>
+        <tr><td style="padding:7px 0;color:#555;">Zone</td><td style="padding:7px 0;text-align:right;font-weight:600;">${t.zone ? escapeHtml(t.zone) : '—'}</td></tr>
+        <tr><td style="padding:7px 0;color:#555;">Quantité</td><td style="padding:7px 0;text-align:right;font-weight:600;">${t.qte}</td></tr>
+        <tr><td style="padding:12px 0 0;color:#555;border-top:2px solid #ccc;">Date</td><td style="padding:12px 0 0;text-align:right;font-weight:600;border-top:2px solid #ccc;">${formatDate(t.dateModification)}</td></tr>
+      </table>
+    </div>
+  `;
+  setTimeout(()=> window.print(), 100);
+}
+
+/* ---------------------------------------------------------
+   SCANNER
+--------------------------------------------------------- */
+let scanResultZone = null;
+let scanNotFoundCode = null;
+
+function renderScanner(){
+  const view = document.getElementById('view');
+  view.innerHTML = `
+    <header class="page">
+      <div>
+        <div class="eyebrow">Localisation</div>
+        <h1>Scanner une zone</h1>
+        <div class="lede">Scannez en direct avec la caméra, ou prenez une photo de l'étiquette QR du rack.</div>
+      </div>
+    </header>
+
+    <div class="scanner-wrap">
+      <div class="viewfinder" id="viewfinder">
+        <div class="idle" id="scan-idle">
+          <div>Choisissez une méthode pour lire l'étiquette QR de la zone.</div>
+          <button class="btn primary" id="start-live">🔴 Scanner en direct</button>
+          <button class="btn" id="start-scan">📷 Prendre une photo</button>
+          <input type="file" accept="image/*" capture="environment" id="qr-photo-input" style="display:none">
+        </div>
+      </div>
+
+      <div class="scan-panel">
+        <div id="scan-result">
+          <div class="banner">Aucune zone scannée pour le moment. Vous pouvez aussi saisir un code manuellement ci-dessous.</div>
+        </div>
+        <div class="manual-scan">
+          <label>Saisie manuelle du code de zone</label>
+          <div class="row">
+            <input type="text" id="manual-code" placeholder="Ex. A1" style="flex:1">
+            <button class="btn" id="manual-go">Valider</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('start-live').onclick = startLiveScanner;
+  document.getElementById('start-scan').onclick = ()=> document.getElementById('qr-photo-input').click();
+  document.getElementById('qr-photo-input').addEventListener('change', onQrPhotoSelected);
+  document.getElementById('manual-go').onclick = ()=>{
+    const code = document.getElementById('manual-code').value.trim().toUpperCase();
+    if(code) handleScanCode(code);
+  };
+  document.getElementById('manual-code').addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ document.getElementById('manual-go').click(); }
+  });
+}
+
+let scanStream = null;
+let liveScanTimer = null;
+let liveScanActive = false;
+
+async function startLiveScanner(){
+  const vf = document.getElementById('viewfinder');
+  vf.innerHTML = `<div class="idle">Ouverture de la caméra…</div>`;
+  try{
+    scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+  }catch(e){
+    console.error(e);
+    vf.innerHTML = `<div class="idle">Accès caméra refusé ou indisponible.<br>Utilisez plutôt "Prendre une photo" ci-dessous.</div>`;
+    return;
+  }
+  vf.innerHTML = `
+    <video id="scan-video" playsinline muted autoplay></video>
+    <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+    <div class="scan-line"></div>
+  `;
+  const video = document.getElementById('scan-video');
+  video.srcObject = scanStream;
+  await video.play();
+
+  const detector = ('BarcodeDetector' in window) ? new BarcodeDetector({ formats: ['qr_code'] }) : null;
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+  liveScanActive = true;
+  let busy = false;
+
+  liveScanTimer = setInterval(async ()=>{
+    if(busy || !liveScanActive || video.readyState < video.HAVE_ENOUGH_DATA) return;
+    busy = true;
+    try{
+      let value = null;
+      if(detector){
+        try{
+          const results = await detector.detect(video);
+          if(results && results.length) value = results[0].rawValue;
+        }catch(err){ /* on retente avec jsQR ci-dessous sur cette même image */ }
+      }
+      if(!value){
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'attemptBoth' });
+        if(code && code.data) value = code.data;
+      }
+      if(value){
+        stopLiveScanner();
+        handleScanCode(value.trim().toUpperCase());
+      }
+    } finally {
+      busy = false;
+    }
+  }, 350);
+}
+
+function stopLiveScanner(){
+  liveScanActive = false;
+  if(liveScanTimer){ clearInterval(liveScanTimer); liveScanTimer = null; }
+  if(scanStream){ scanStream.getTracks().forEach(tr=>tr.stop()); scanStream = null; }
+}
+
+async function tryNativeBarcodeDetector(img){
+  if(!('BarcodeDetector' in window)) return null;
+  try{
+    const detector = new BarcodeDetector({ formats: ['qr_code'] });
+    const results = await detector.detect(img);
+    if(results && results.length && results[0].rawValue) return results[0].rawValue;
+  }catch(err){
+    console.warn('BarcodeDetector indisponible ou en échec, repli sur jsQR:', err);
+  }
+  return null;
+}
+
+function decodeQrFromCanvas(ctx, w, h){
+  const imgData = ctx.getImageData(0, 0, w, h);
+  return jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'attemptBoth' });
+}
+
+function tryDecodeAtScale(img, maxDim){
+  const nw = img.naturalWidth, nh = img.naturalHeight;
+  const scale = Math.min(1, maxDim / Math.max(nw, nh));
+  const w = Math.max(1, Math.round(nw * scale));
+  const h = Math.max(1, Math.round(nh * scale));
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(img, 0, 0, w, h);
+  return decodeQrFromCanvas(ctx, w, h);
+}
+
+function tryDecodeCropped(img, cropFraction, targetSize){
+  const nw = img.naturalWidth, nh = img.naturalHeight;
+  const cropW = nw * cropFraction, cropH = nh * cropFraction;
+  const sx = (nw - cropW) / 2, sy = (nh - cropH) / 2;
+  const canvas = document.createElement('canvas');
+  canvas.width = targetSize; canvas.height = targetSize;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(img, sx, sy, cropW, cropH, 0, 0, targetSize, targetSize);
+  return decodeQrFromCanvas(ctx, targetSize, targetSize);
+}
+
+async function onQrPhotoSelected(e){
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  const vf = document.getElementById('viewfinder');
+  vf.innerHTML = `<div class="idle">Analyse de la photo…</div>`;
+
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+
+  img.onload = async ()=>{
+    URL.revokeObjectURL(url);
+    try{
+      // 0. Détecteur natif du navigateur (même moteur que l'appareil photo du téléphone) — le plus fiable
+      const native = await tryNativeBarcodeDetector(img);
+      if(native){
+        handleScanCode(native.trim().toUpperCase());
+        return;
+      }
+
+      const nw = img.naturalWidth, nh = img.naturalHeight;
+      let code = null;
+
+      // 1. Repli : jsQR sur l'image entière, à plusieurs résolutions
+      for(const maxDim of [2000, 1200, Math.max(nw, nh), 800]){
+        code = tryDecodeAtScale(img, maxDim);
+        if(code && code.data) break;
+      }
+
+      // 2. Repli : recadrage automatique sur le centre, agrandi
+      if(!code || !code.data){
+        for(const cropFraction of [0.6, 0.4, 0.25, 0.15]){
+          code = tryDecodeCropped(img, cropFraction, 900);
+          if(code && code.data) break;
+        }
+      }
+
+      if(code && code.data){
+        handleScanCode(code.data.trim().toUpperCase());
+      }else{
+        showScanFailure("Aucun QR code détecté sur cette photo.<br>Essayez de vous rapprocher un peu plus de l'étiquette et évitez les reflets.");
+      }
+    }catch(err){
+      console.error('Erreur analyse QR:', err);
+      showScanFailure("Erreur pendant l'analyse de la photo.<br>Réessayez avec une photo moins zoomée.");
+    }
+  };
+  img.onerror = ()=>{
+    showScanFailure("Impossible de lire cette photo.");
+  };
+  img.src = url;
+}
+
+function showScanFailure(message){
+  const vf = document.getElementById('viewfinder');
+  vf.innerHTML = `
+    <div class="idle">
+      ${message}
+      <button class="btn primary small" id="retry-scan" style="margin-top:10px">Réessayer</button>
+    </div>`;
+  document.getElementById('retry-scan').onclick = renderScanner;
+}
+
+function handleScanCode(code){
+  stopLiveScanner();
+  const zone = zones.find(z=>z.code === code);
+  const panel = document.getElementById('scan-result');
+  const vf = document.getElementById('viewfinder');
+  if(vf){
+    vf.innerHTML = `<div class="idle">Code lu : <b style="color:var(--ink)">${escapeHtml(code)}</b><br><button class="btn small" id="rescan-btn" style="margin-top:8px">Scanner à nouveau</button></div>`;
+    document.getElementById('rescan-btn').onclick = renderScanner;
+  }
+  if(!panel) return;
+
+  if(zone){
+    const items = toles.filter(t=>t.zone===zone.code);
+    panel.innerHTML = `
+      <div class="result-card found">
+        <div class="tag-code">${escapeHtml(zone.code)}</div>
+        <div class="tag-name" style="margin-bottom:12px">${escapeHtml(zone.nom)}</div>
+        ${items.length===0 ? `<div class="lede" style="margin:0 0 12px">Aucune tôle affectée à cette zone pour l'instant.</div>` : `
+          <table style="margin-bottom:12px">
+            <thead><tr><th>Référence</th><th>Nuance</th><th>Dimensions</th><th>Qté</th></tr></thead>
+            <tbody>
+              ${items.map(t=>`<tr><td class="ref">${escapeHtml(t.ref)}</td><td class="dim">${t.nuance ? escapeHtml(t.nuance) : '—'}</td><td class="dim">${t.longueur}×${t.largeur}×${t.epaisseur}mm</td><td>${t.qte}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        `}
+        <button class="btn primary small" id="add-here">+ Ajouter une tôle dans cette zone</button>
+      </div>
+    `;
+    document.getElementById('add-here').onclick = ()=> openToleModal(null, zone.code);
+  }else{
+    panel.innerHTML = `
+      <div class="result-card notfound">
+        <div class="tag-code">${escapeHtml(code)}</div>
+        <div class="lede" style="margin:6px 0 12px">Cette zone n'existe pas encore dans le système.</div>
+        <button class="btn primary small" id="create-zone-here">Créer cette zone</button>
+      </div>
+    `;
+    document.getElementById('create-zone-here').onclick = ()=>{
+      zones.push({ code, nom: code });
+      saveZones();
+      toast('Zone créée');
+      handleScanCode(code);
+    };
+  }
+}
+
+/* ---------------------------------------------------------
+   UTIL
+--------------------------------------------------------- */
+function escapeHtml(str){
+  return String(str ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/* ---------------------------------------------------------
+   INIT
+--------------------------------------------------------- */
+async function startApp(user){
+  document.getElementById('auth-gate').style.display = 'none';
+  document.getElementById('ruler').style.display = '';
+  document.getElementById('sidebar').style.display = '';
+  document.getElementById('main-view').style.display = '';
+  document.getElementById('sidebar-foot').innerHTML = `
+    <div class="user-chip">
+      <span class="dot"></span>${escapeHtml(user.email)}
+      <button id="logout-btn">Se déconnecter</button>
+    </div>`;
+  document.getElementById('logout-btn').addEventListener('click', ()=> auth.signOut());
+  document.getElementById('view').innerHTML = `<div class="lede">Chargement du stock…</div>`;
+  await loadData();
+  render();
+}
+
+function authGateHtml(mode, error){
+  const isSignup = mode === 'signup';
+  return `
+    <div class="auth-box">
+      <div class="auth-brand">TÔLE<span>RIE</span></div>
+      <div class="auth-sub">${isSignup ? 'Créer un compte pour accéder au stock' : 'Connexion à la gestion de stock'}</div>
+      <form id="auth-form">
+        <div class="field"><label>E-mail</label><input type="email" id="auth-email" required autofocus></div>
+        <div class="field"><label>Mot de passe</label><input type="password" id="auth-password" required minlength="6"></div>
+        ${error ? `<div class="auth-error">${escapeHtml(error)}</div>` : ''}
+        <button type="submit" class="btn primary" style="width:100%;justify-content:center;">${isSignup ? 'Créer le compte' : 'Se connecter'}</button>
+      </form>
+      <div class="auth-switch">
+        ${isSignup
+          ? `Tu as déjà un compte ? <a id="auth-switch-link">Se connecter</a>`
+          : `Pas encore de compte ? <a id="auth-switch-link">En créer un</a>`}
+      </div>
+    </div>`;
+}
+
+function renderAuthGate(mode, error){
+  const gate = document.getElementById('auth-gate');
+  gate.style.display = 'flex';
+  gate.innerHTML = authGateHtml(mode, error);
+  document.getElementById('auth-switch-link').addEventListener('click', ()=>{
+    renderAuthGate(mode === 'signup' ? 'login' : 'signup');
+  });
+  document.getElementById('auth-form').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const email = document.getElementById('auth-email').value.trim();
+    const password = document.getElementById('auth-password').value;
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    try{
+      if(mode === 'signup'){
+        await auth.createUserWithEmailAndPassword(email, password);
+      }else{
+        await auth.signInWithEmailAndPassword(email, password);
+      }
+      // onAuthStateChanged prendra le relais
+    }catch(err){
+      const messages = {
+        'auth/email-already-in-use': 'Un compte existe déjà avec cet e-mail — connecte-toi plutôt.',
+        'auth/invalid-email': 'Adresse e-mail invalide.',
+        'auth/weak-password': 'Mot de passe trop court (6 caractères minimum).',
+        'auth/user-not-found': 'Aucun compte avec cet e-mail — crée-en un.',
+        'auth/wrong-password': 'Mot de passe incorrect.',
+        'auth/invalid-credential': 'Identifiant ou mot de passe incorrect.',
+      };
+      renderAuthGate(mode, messages[err.code] || 'Une erreur est survenue. Réessaie.');
+    }
+  });
+}
+
+auth.onAuthStateChanged(user => {
+  if(user){
+    startApp(user);
+  }else{
+    document.getElementById('ruler').style.display = 'none';
+    document.getElementById('sidebar').style.display = 'none';
+    document.getElementById('main-view').style.display = 'none';
+    renderAuthGate('login');
+  }
+});
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+}
+</script>
+</body>
+</html>
