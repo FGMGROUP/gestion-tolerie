@@ -388,7 +388,7 @@ async function loadData(){
         id: uid(), _fbId: d.id,
         ref: data.ref || '', matiere: data.matiere || 'Acier', nuance: data.nuance || '',
         epaisseur: Number(data.epaisseur) || 0, longueur: Number(data.longueur) || 0, largeur: Number(data.largeur) || 0,
-        qte: Number(data.qte) || 0, seuil: Number(data.seuil) || 0, zone: data.zone || '',
+        qte: Number(data.qte) || 0, seuil: Number(data.seuil) || 0, zone: data.zone || '', palette: data.palette || '',
         dateCreation: data.dateCreation || null, dateModification: data.dateModification || null
       };
     });
@@ -411,7 +411,7 @@ async function saveToles(){
       const fields = {
         ref: t.ref, matiere: t.matiere, nuance: t.nuance || '',
         epaisseur: t.epaisseur, longueur: t.longueur, largeur: t.largeur,
-        qte: t.qte, seuil: t.seuil, zone: t.zone || '',
+        qte: t.qte, seuil: t.seuil, zone: t.zone || '', palette: t.palette || '',
         dateCreation: t.dateCreation || new Date().toISOString(),
         dateModification: t.dateModification || new Date().toISOString()
       };
@@ -470,18 +470,21 @@ let invSearch = '';
 let invZoneFilter = '';
 let invNuanceFilter = '';
 let invEpFilter = '';
+let invPaletteFilter = '';
 
 function renderInventaire(){
   const view = document.getElementById('view');
   const filtered = toles.filter(t=>{
-    const matchSearch = !invSearch || (t.ref+t.matiere+(t.nuance||'')).toLowerCase().includes(invSearch.toLowerCase());
+    const matchSearch = !invSearch || (t.ref+t.matiere+(t.nuance||'')+(t.palette||'')).toLowerCase().includes(invSearch.toLowerCase());
     const matchZone = !invZoneFilter || t.zone === invZoneFilter;
     const matchNuance = !invNuanceFilter || (t.nuance||'') === invNuanceFilter;
     const matchEp = !invEpFilter || String(t.epaisseur) === invEpFilter;
-    return matchSearch && matchZone && matchNuance && matchEp;
+    const matchPalette = !invPaletteFilter || (t.palette||'') === invPaletteFilter;
+    return matchSearch && matchZone && matchNuance && matchEp && matchPalette;
   });
   const nuancesDispo = [...new Set(toles.map(t=>t.nuance).filter(Boolean))].sort();
   const epaisseursDispo = [...new Set(toles.map(t=>t.epaisseur))].sort((a,b)=>a-b);
+  const palettesDispo = [...new Set(toles.map(t=>t.palette).filter(Boolean))].sort();
 
   view.innerHTML = `
     <header class="page">
@@ -507,6 +510,10 @@ function renderInventaire(){
         <option value="">Toutes les épaisseurs</option>
         ${epaisseursDispo.map(ep=>`<option value="${ep}" ${invEpFilter===String(ep)?'selected':''}>${ep} mm</option>`).join('')}
       </select>
+      <select id="inv-palette-filter">
+        <option value="">Toutes les palettes</option>
+        ${palettesDispo.map(p=>`<option value="${escapeHtml(p)}" ${invPaletteFilter===p?'selected':''}>${escapeHtml(p)}</option>`).join('')}
+      </select>
     </div>
 
     ${filtered.length === 0 ? `
@@ -519,7 +526,7 @@ function renderInventaire(){
       <table>
         <thead>
           <tr>
-            <th>Référence</th><th>Matière</th><th>Nuance</th><th>Dimensions</th><th>Épaisseur</th>
+            <th>Référence</th><th>Matière</th><th>Nuance</th><th>Palette</th><th>Dimensions</th><th>Épaisseur</th>
             <th>Zone</th><th>Quantité</th><th>Modifié le</th><th></th>
           </tr>
         </thead>
@@ -529,6 +536,7 @@ function renderInventaire(){
               <td class="ref">${escapeHtml(t.ref)}</td>
               <td>${escapeHtml(t.matiere)}</td>
               <td class="dim">${t.nuance ? escapeHtml(t.nuance) : '—'}</td>
+              <td class="dim">${t.palette ? escapeHtml(t.palette) : '—'}</td>
               <td class="dim">${t.longueur}×${t.largeur} mm</td>
               <td class="dim">${t.epaisseur} mm</td>
               <td>${t.zone ? `<span class="zone-pill">${t.zone}</span>` : '<span class="dim">—</span>'}</td>
@@ -560,6 +568,7 @@ function renderInventaire(){
   document.getElementById('inv-zone-filter').onchange = (e)=>{ invZoneFilter = e.target.value; renderInventaire(); };
   document.getElementById('inv-nuance-filter').onchange = (e)=>{ invNuanceFilter = e.target.value; renderInventaire(); };
   document.getElementById('inv-ep-filter').onchange = (e)=>{ invEpFilter = e.target.value; renderInventaire(); };
+  document.getElementById('inv-palette-filter').onchange = (e)=>{ invPaletteFilter = e.target.value; renderInventaire(); };
 
   view.querySelectorAll('[data-qty]').forEach(b=>{
     b.onclick = async ()=>{
@@ -589,7 +598,7 @@ function renderInventaire(){
 
 function openToleModal(existing, prefillZone){
   const editing = !!existing;
-  const t = existing || { id: uid(), ref:'', matiere:'Acier', nuance:'', epaisseur:1, longueur:1000, largeur:1000, qte:1, seuil:1, zone: prefillZone || '' };
+  const t = existing || { id: uid(), ref:'', matiere:'Acier', nuance:'', epaisseur:1, longueur:1000, largeur:1000, qte:1, seuil:1, zone: prefillZone || '', palette:'' };
   const overlay = document.createElement('div');
   overlay.className = 'overlay';
   overlay.innerHTML = `
@@ -611,6 +620,7 @@ function openToleModal(existing, prefillZone){
         <div class="field"><label>Épaisseur (mm)</label><input type="number" step="0.1" id="f-ep" value="${t.epaisseur}"></div>
       </div>
       <div class="field"><label>Nuance</label><input type="text" id="f-nuance" value="${escapeHtml(t.nuance||'')}" placeholder="Ex. S235JR, DX51D, 5754, 304L…"></div>
+      <div class="field"><label>N° de palette <span style="text-transform:none;letter-spacing:0;color:var(--ink-dim);font-weight:400;">(pour distinguer 2 palettes de la même matière)</span></label><input type="text" id="f-palette" value="${escapeHtml(t.palette||'')}" placeholder="Ex. P-01, P-02…"></div>
       <div class="grid2">
         <div class="field"><label>Longueur (mm)</label><input type="number" id="f-long" value="${t.longueur}"></div>
         <div class="field"><label>Largeur (mm)</label><input type="number" id="f-larg" value="${t.largeur}"></div>
@@ -669,6 +679,7 @@ function openToleModal(existing, prefillZone){
     t.ref = ref;
     t.matiere = overlay.querySelector('#f-matiere').value;
     t.nuance = overlay.querySelector('#f-nuance').value.trim();
+    t.palette = overlay.querySelector('#f-palette').value.trim();
     t.epaisseur = parseFloat(overlay.querySelector('#f-ep').value) || 0;
     t.longueur = parseInt(overlay.querySelector('#f-long').value) || 0;
     t.largeur = parseInt(overlay.querySelector('#f-larg').value) || 0;
@@ -905,6 +916,7 @@ function printToleTag(t){
       <div class="pname">${escapeHtml(t.matiere)}${t.nuance ? ' · ' + escapeHtml(t.nuance) : ''}</div>
       <table style="width:100%;font-size:19px;border-collapse:collapse;margin-top:16px;">
         <tr><td style="padding:7px 0;color:#555;">Nuance</td><td style="padding:7px 0;text-align:right;font-weight:600;">${t.nuance ? escapeHtml(t.nuance) : '—'}</td></tr>
+        <tr><td style="padding:7px 0;color:#555;">Palette</td><td style="padding:7px 0;text-align:right;font-weight:600;">${t.palette ? escapeHtml(t.palette) : '—'}</td></tr>
         <tr><td style="padding:7px 0;color:#555;">Épaisseur</td><td style="padding:7px 0;text-align:right;font-weight:600;">${t.epaisseur} mm</td></tr>
         <tr><td style="padding:7px 0;color:#555;">Dimensions</td><td style="padding:7px 0;text-align:right;font-weight:600;">${t.longueur}×${t.largeur} mm</td></tr>
         <tr><td style="padding:7px 0;color:#555;">Zone</td><td style="padding:7px 0;text-align:right;font-weight:600;">${t.zone ? escapeHtml(t.zone) : '—'}</td></tr>
@@ -1156,9 +1168,9 @@ function handleScanCode(code){
         <div class="tag-name" style="margin-bottom:12px">${escapeHtml(zone.nom)}</div>
         ${items.length===0 ? `<div class="lede" style="margin:0 0 12px">Aucune tôle affectée à cette zone pour l'instant.</div>` : `
           <table style="margin-bottom:12px">
-            <thead><tr><th>Référence</th><th>Nuance</th><th>Dimensions</th><th>Qté</th></tr></thead>
+            <thead><tr><th>Référence</th><th>Nuance</th><th>Palette</th><th>Dimensions</th><th>Qté</th></tr></thead>
             <tbody>
-              ${items.map(t=>`<tr><td class="ref">${escapeHtml(t.ref)}</td><td class="dim">${t.nuance ? escapeHtml(t.nuance) : '—'}</td><td class="dim">${t.longueur}×${t.largeur}×${t.epaisseur}mm</td><td>${t.qte}</td></tr>`).join('')}
+              ${items.map(t=>`<tr><td class="ref">${escapeHtml(t.ref)}</td><td class="dim">${t.nuance ? escapeHtml(t.nuance) : '—'}</td><td class="dim">${t.palette ? escapeHtml(t.palette) : '—'}</td><td class="dim">${t.longueur}×${t.largeur}×${t.epaisseur}mm</td><td>${t.qte}</td></tr>`).join('')}
             </tbody>
           </table>
         `}
