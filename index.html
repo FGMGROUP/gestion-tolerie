@@ -16,6 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dxf-parser@1.1.2/dist/dxf-parser.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
@@ -71,6 +72,9 @@
     text-align:left;background:none;border:none;color:var(--ink-dim);padding:11px 10px;border-radius:var(--radius);
     cursor:pointer;display:flex;align-items:center;gap:10px;border-left:3px solid transparent;
   }
+  .nav-group{margin-top:22px;}
+  .nav-group:first-child{margin-top:0;}
+  .nav-group-title{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-dim);opacity:.6;padding:0 10px 4px;}
   .nav-btn .num{font-family:var(--mono);font-size:11px;color:var(--ink-dim);}
   .nav-btn:hover{color:var(--ink);background:var(--panel-2);}
   .nav-btn.active{color:var(--ink);background:var(--panel-2);border-left-color:var(--accent);}
@@ -127,6 +131,10 @@
   .qty-val{font-family:var(--mono);min-width:24px;text-align:center;font-weight:600;}
   .qty-low .qty-val{color:var(--danger);}
   .row-actions{display:flex;gap:4px;justify-content:flex-end;}
+  .attach-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:13px;}
+  .attach-badge.filled{background:var(--accent);color:#1a1a1a;cursor:pointer;border:none;}
+  .attach-badge.filled:hover{filter:brightness(1.1);}
+  .attach-badge.empty{background:transparent;border:1px dashed var(--line);color:var(--ink-dim);}
 
   .empty{
     border:1px dashed var(--line);border-radius:var(--radius);padding:46px 24px;text-align:center;color:var(--ink-dim);
@@ -170,6 +178,17 @@
   @keyframes scanmove{0%{top:16%;}50%{top:84%;}100%{top:16%;}}
   .scan-panel{flex:1;min-width:280px;}
   .result-card{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
+
+  .dxf-viewer{position:relative;overflow:hidden;background:#fff;touch-action:none;user-select:none;}
+  .dxf-viewer svg{display:block;transform-origin:0 0;cursor:grab;}
+  .dxf-viewer.dragging svg{cursor:grabbing;}
+  .dxf-viewer-controls{position:absolute;top:8px;right:8px;display:flex;flex-direction:column;gap:4px;z-index:2;}
+  .dxf-viewer-controls button{
+    width:28px;height:28px;border-radius:50%;background:var(--panel);border:1px solid var(--line);color:var(--ink);
+    font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  }
+  .dxf-viewer-controls button:hover{border-color:var(--accent);color:var(--accent);}
+  .dxf-viewer-hint{position:absolute;bottom:6px;left:8px;font-size:10.5px;color:#9aa2a9;background:rgba(255,255,255,0.85);padding:2px 6px;border-radius:4px;z-index:2;}
   .result-card.found{border-color:var(--ok);}
   .result-card.notfound{border-color:var(--danger);}
   .manual-scan{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);}
@@ -305,9 +324,26 @@
   <div class="brand">TÔLE<span>RIE</span></div>
   <div class="brand-sub">Gestion de stock</div>
   <nav>
-    <button class="nav-btn active" data-tab="inventaire"><span class="num">01</span> Inventaire</button>
-    <button class="nav-btn" data-tab="zones"><span class="num">02</span> Zones</button>
-    <button class="nav-btn" data-tab="scanner"><span class="num">03</span> Scanner QR</button>
+    <div class="nav-group">
+      <div class="nav-group-title">Rangement tôlerie</div>
+      <button class="nav-btn active" data-tab="inventaire"><span class="num">01</span> Inventaire</button>
+      <button class="nav-btn" data-tab="zones"><span class="num">02</span> Zones</button>
+      <button class="nav-btn" data-tab="scanner"><span class="num">03</span> Scanner QR</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">Laser — simulation &amp; imbrication</div>
+      <button class="nav-btn" data-tab="decoupelaser"><span class="num">04</span> Découpe laser</button>
+      <button class="nav-btn" data-tab="imbrication"><span class="num">05</span> Imbrication</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">Emboutissage</div>
+      <button class="nav-btn" data-tab="embpiece"><span class="num">06</span> Pièce</button>
+      <button class="nav-btn" data-tab="taboutil"><span class="num">07</span> Outillage</button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-title">Réglages</div>
+      <button class="nav-btn" data-tab="parametres"><span class="num">08</span> Paramètres</button>
+    </div>
   </nav>
   <div class="sidebar-foot" id="sidebar-foot"><span class="dot"></span>Connexion…</div>
 </div>
@@ -325,6 +361,9 @@
 --------------------------------------------------------- */
 let toles = [];
 let zones = [];
+let embPieces = [];
+let embOutils = [];
+let settings = { paletteStart: 1, defaultLongueur: 1000, defaultLargeur: 1000, defaultEpaisseur: 1, defaultMatiere: 'Acier', defaultSeuil: 1 };
 let currentTab = 'inventaire';
 
 /* ---------------------------------------------------------
@@ -379,27 +418,115 @@ function generateRef(matiere, nuance, epaisseur, longueur, largeur, excludeId){
   return `${base}-${String(next).padStart(3,'0')}`;
 }
 
-async function loadData(){
-  try{
-    const snap = await db.collection('toles').get();
-    toles = snap.docs.map(d=>{
-      const data = d.data();
-      return {
-        id: uid(), _fbId: d.id,
-        ref: data.ref || '', matiere: data.matiere || 'Acier', nuance: data.nuance || '',
-        epaisseur: Number(data.epaisseur) || 0, longueur: Number(data.longueur) || 0, largeur: Number(data.largeur) || 0,
-        qte: Number(data.qte) || 0, seuil: Number(data.seuil) || 0, zone: data.zone || '', palette: data.palette || '',
-        dateCreation: data.dateCreation || null, dateModification: data.dateModification || null
-      };
-    });
-    serverIdSnapshots.toles = new Set(toles.map(t=>t._fbId));
-  }catch(e){ console.error(e); toles = []; toast('Impossible de charger le stock depuis Firebase'); }
+let unsubToles = null, unsubZones = null, unsubSettings = null, unsubEmbPieces = null, unsubEmbOutils = null;
 
+function detachListeners(){
+  if(unsubToles){ unsubToles(); unsubToles = null; }
+  if(unsubZones){ unsubZones(); unsubZones = null; }
+  if(unsubSettings){ unsubSettings(); unsubSettings = null; }
+  if(unsubEmbPieces){ unsubEmbPieces(); unsubEmbPieces = null; }
+  if(unsubEmbOutils){ unsubEmbOutils(); unsubEmbOutils = null; }
+}
+
+async function loadData(){
+  await new Promise((resolve)=>{
+    let done = 0;
+    const TOTAL = 5;
+    const checkDone = ()=>{ done++; if(done>=TOTAL) resolve(); };
+
+    unsubToles = db.collection('toles').onSnapshot(snap=>{
+      toles = snap.docs.map(d=>{
+        const data = d.data();
+        return {
+          id: uid(), _fbId: d.id,
+          ref: data.ref || '', matiere: data.matiere || 'Acier', nuance: data.nuance || '',
+          epaisseur: Number(data.epaisseur) || 0, longueur: Number(data.longueur) || 0, largeur: Number(data.largeur) || 0,
+          qte: Number(data.qte) || 0, seuil: Number(data.seuil) || 0, zone: data.zone || '', palette: data.palette || '',
+          secteur: data.secteur || 'Autre',
+          attachment: data.attachment || null,
+          dateCreation: data.dateCreation || null, dateModification: data.dateModification || null
+        };
+      });
+      serverIdSnapshots.toles = new Set(toles.map(t=>t._fbId));
+      if(done>=TOTAL) renderLiveSafe();
+      checkDone();
+    }, e=>{ console.error(e); toles = []; toast('Impossible de charger le stock depuis Firebase'); checkDone(); });
+
+    unsubZones = db.collection('zones').onSnapshot(snap=>{
+      zones = snap.docs.map(d=>({ code: d.id, nom: d.data().nom || d.id }));
+      serverIdSnapshots.zones = new Set(zones.map(z=>z.code));
+      if(done>=TOTAL) renderLiveSafe();
+      checkDone();
+    }, e=>{ console.error(e); zones = []; toast('Impossible de charger les zones depuis Firebase'); checkDone(); });
+
+    unsubSettings = db.collection('config').doc('settings').onSnapshot(sdoc=>{
+      if(sdoc.exists){
+        const d = sdoc.data();
+        settings = {
+          paletteStart: Number(d.paletteStart) || 1,
+          defaultLongueur: Number(d.defaultLongueur) || 1000,
+          defaultLargeur: Number(d.defaultLargeur) || 1000,
+          defaultEpaisseur: Number(d.defaultEpaisseur) || 1,
+          defaultMatiere: d.defaultMatiere || 'Acier',
+          defaultSeuil: Number(d.defaultSeuil) || 1,
+        };
+      }
+      if(done>=TOTAL) renderLiveSafe();
+      checkDone();
+    }, e=>{ console.error(e); checkDone(); });
+
+    unsubEmbPieces = db.collection('embPieces').onSnapshot(snap=>{
+      embPieces = snap.docs.map(d=> Object.assign(defaultEmbPiece(), d.data(), { id: uid(), _fbId: d.id }));
+      serverIdSnapshots.embPieces = new Set(embPieces.map(p=>p._fbId));
+      if(done>=TOTAL) renderLiveSafe();
+      checkDone();
+    }, e=>{ console.error(e); embPieces = []; checkDone(); });
+
+    unsubEmbOutils = db.collection('embOutils').onSnapshot(snap=>{
+      embOutils = snap.docs.map(d=> Object.assign(defaultEmbOutil(), d.data(), { id: uid(), _fbId: d.id }));
+      serverIdSnapshots.embOutils = new Set(embOutils.map(o=>o._fbId));
+      if(done>=TOTAL) renderLiveSafe();
+      checkDone();
+    }, e=>{ console.error(e); embOutils = []; checkDone(); });
+  });
+}
+
+async function saveSettings(){
   try{
-    const zsnap = await db.collection('zones').get();
-    zones = zsnap.docs.map(d=>({ code: d.id, nom: d.data().nom || d.id }));
-    serverIdSnapshots.zones = new Set(zones.map(z=>z.code));
-  }catch(e){ console.error(e); zones = []; toast('Impossible de charger les zones depuis Firebase'); }
+    await db.collection('config').doc('settings').set(settings);
+  }catch(e){ console.error(e); toast('Impossible d\'enregistrer les paramètres'); }
+}
+
+async function saveEmbPieces(){
+  try{
+    const currentIds = new Set(embPieces.filter(p=>p._fbId).map(p=>p._fbId));
+    const removed = [...(serverIdSnapshots.embPieces || new Set())].filter(id=>!currentIds.has(id));
+    for(const id of removed){ await db.collection('embPieces').doc(id).delete(); }
+    for(const p of embPieces){
+      const fields = Object.assign({}, p);
+      delete fields.id; delete fields._fbId;
+      fields.dateModification = new Date().toISOString();
+      if(p._fbId){ await db.collection('embPieces').doc(p._fbId).set(fields); }
+      else{ const ref = await db.collection('embPieces').add(fields); p._fbId = ref.id; }
+    }
+    serverIdSnapshots.embPieces = new Set(embPieces.filter(p=>p._fbId).map(p=>p._fbId));
+  }catch(e){ console.error(e); toast('Erreur de synchronisation Firebase — vérifiez la console'); }
+}
+
+async function saveEmbOutils(){
+  try{
+    const currentIds = new Set(embOutils.filter(o=>o._fbId).map(o=>o._fbId));
+    const removed = [...(serverIdSnapshots.embOutils || new Set())].filter(id=>!currentIds.has(id));
+    for(const id of removed){ await db.collection('embOutils').doc(id).delete(); }
+    for(const o of embOutils){
+      const fields = Object.assign({}, o);
+      delete fields.id; delete fields._fbId;
+      fields.dateModification = new Date().toISOString();
+      if(o._fbId){ await db.collection('embOutils').doc(o._fbId).set(fields); }
+      else{ const ref = await db.collection('embOutils').add(fields); o._fbId = ref.id; }
+    }
+    serverIdSnapshots.embOutils = new Set(embOutils.filter(o=>o._fbId).map(o=>o._fbId));
+  }catch(e){ console.error(e); toast('Erreur de synchronisation Firebase — vérifiez la console'); }
 }
 
 async function saveToles(){
@@ -412,6 +539,8 @@ async function saveToles(){
         ref: t.ref, matiere: t.matiere, nuance: t.nuance || '',
         epaisseur: t.epaisseur, longueur: t.longueur, largeur: t.largeur,
         qte: t.qte, seuil: t.seuil, zone: t.zone || '', palette: t.palette || '',
+        secteur: t.secteur || 'Autre',
+        attachment: t.attachment || null,
         dateCreation: t.dateCreation || new Date().toISOString(),
         dateModification: t.dateModification || new Date().toISOString()
       };
@@ -461,6 +590,19 @@ function render(){
   if(currentTab === 'inventaire') renderInventaire();
   else if(currentTab === 'zones') renderZones();
   else if(currentTab === 'scanner') renderScanner();
+  else if(currentTab === 'parametres') renderParametres();
+  else if(currentTab === 'imbrication') renderImbrication();
+  else if(currentTab === 'decoupelaser') renderDecoupeLaser();
+  else if(currentTab === 'embpiece') renderEmbPiece();
+  else if(currentTab === 'taboutil') renderEmbOutil();
+}
+
+/* Utilisée par les écouteurs temps réel : on évite de redessiner l'onglet Scanner
+   (couperait la caméra en plein scan) et l'onglet Imbrication (perdrait la saisie en cours). */
+function renderLiveSafe(){
+  if(currentTab === 'inventaire') renderInventaire();
+  else if(currentTab === 'zones') renderZones();
+  else if(currentTab === 'parametres') renderParametres();
 }
 
 /* ---------------------------------------------------------
@@ -471,6 +613,7 @@ let invZoneFilter = '';
 let invNuanceFilter = '';
 let invEpFilter = '';
 let invPaletteFilter = '';
+let invSecteurFilter = '';
 
 function renderInventaire(){
   const view = document.getElementById('view');
@@ -480,11 +623,12 @@ function renderInventaire(){
     const matchNuance = !invNuanceFilter || (t.nuance||'') === invNuanceFilter;
     const matchEp = !invEpFilter || String(t.epaisseur) === invEpFilter;
     const matchPalette = !invPaletteFilter || (t.palette||'') === invPaletteFilter;
-    return matchSearch && matchZone && matchNuance && matchEp && matchPalette;
+    const matchSecteur = !invSecteurFilter || (t.secteur||'Autre') === invSecteurFilter;
+    return matchSearch && matchZone && matchNuance && matchEp && matchPalette && matchSecteur;
   });
   const nuancesDispo = [...new Set(toles.map(t=>t.nuance).filter(Boolean))].sort();
   const epaisseursDispo = [...new Set(toles.map(t=>t.epaisseur))].sort((a,b)=>a-b);
-  const palettesDispo = [...new Set(toles.map(t=>t.palette).filter(Boolean))].sort();
+  const palettesDispo = [...new Set(toles.map(t=>t.palette).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
 
   view.innerHTML = `
     <header class="page">
@@ -512,7 +656,11 @@ function renderInventaire(){
       </select>
       <select id="inv-palette-filter">
         <option value="">Toutes les palettes</option>
-        ${palettesDispo.map(p=>`<option value="${escapeHtml(p)}" ${invPaletteFilter===p?'selected':''}>${escapeHtml(p)}</option>`).join('')}
+        ${palettesDispo.map(p=>`<option value="${escapeHtml(p)}" ${invPaletteFilter===p?'selected':''}>Palette n°${escapeHtml(p)}</option>`).join('')}
+      </select>
+      <select id="inv-secteur-filter">
+        <option value="">Tous secteurs</option>
+        ${['Aéronautique','Autre'].map(s=>`<option value="${s}" ${invSecteurFilter===s?'selected':''}>${s}</option>`).join('')}
       </select>
     </div>
 
@@ -526,7 +674,7 @@ function renderInventaire(){
       <table>
         <thead>
           <tr>
-            <th>Référence</th><th>Matière</th><th>Nuance</th><th>Palette</th><th>Dimensions</th><th>Épaisseur</th>
+            <th>Référence</th><th>Matière</th><th>Nuance</th><th>Palette</th><th>Secteur</th><th>PJ</th><th>Dimensions</th><th>Épaisseur</th>
             <th>Zone</th><th>Quantité</th><th>Modifié le</th><th></th>
           </tr>
         </thead>
@@ -536,7 +684,13 @@ function renderInventaire(){
               <td class="ref">${escapeHtml(t.ref)}</td>
               <td>${escapeHtml(t.matiere)}</td>
               <td class="dim">${t.nuance ? escapeHtml(t.nuance) : '—'}</td>
-              <td class="dim">${t.palette ? escapeHtml(t.palette) : '—'}</td>
+              <td class="dim">${t.palette ? 'N°'+escapeHtml(t.palette) : '—'}</td>
+              <td class="dim">${escapeHtml(t.secteur||'Autre')}</td>
+              <td style="text-align:center;">
+                ${t.attachment
+                  ? `<button class="attach-badge filled" data-view-attach="${t.id}" title="${escapeHtml(t.attachment.name)}">📎</button>`
+                  : `<span class="attach-badge empty">—</span>`}
+              </td>
               <td class="dim">${t.longueur}×${t.largeur} mm</td>
               <td class="dim">${t.epaisseur} mm</td>
               <td>${t.zone ? `<span class="zone-pill">${t.zone}</span>` : '<span class="dim">—</span>'}</td>
@@ -569,6 +723,7 @@ function renderInventaire(){
   document.getElementById('inv-nuance-filter').onchange = (e)=>{ invNuanceFilter = e.target.value; renderInventaire(); };
   document.getElementById('inv-ep-filter').onchange = (e)=>{ invEpFilter = e.target.value; renderInventaire(); };
   document.getElementById('inv-palette-filter').onchange = (e)=>{ invPaletteFilter = e.target.value; renderInventaire(); };
+  document.getElementById('inv-secteur-filter').onchange = (e)=>{ invSecteurFilter = e.target.value; renderInventaire(); };
 
   view.querySelectorAll('[data-qty]').forEach(b=>{
     b.onclick = async ()=>{
@@ -585,6 +740,12 @@ function renderInventaire(){
   view.querySelectorAll('[data-print-tole]').forEach(b=>{
     b.onclick = ()=> printToleTag(toles.find(x=>x.id===b.dataset.printTole));
   });
+  view.querySelectorAll('[data-view-attach]').forEach(b=>{
+    b.onclick = ()=>{
+      const t = toles.find(x=>x.id===b.dataset.viewAttach);
+      if(t && t.attachment) openAttachmentViewer(t.attachment);
+    };
+  });
   view.querySelectorAll('[data-del]').forEach(b=>{
     b.onclick = async ()=>{
       if(confirm('Supprimer cette référence du stock ?')){
@@ -596,9 +757,69 @@ function renderInventaire(){
   });
 }
 
+function compressImageFile(file, maxDim=1280, quality=0.72){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      const img = new Image();
+      img.onload = ()=>{
+        let w = img.width, h = img.height;
+        if(w > h && w > maxDim){ h = Math.round(h*maxDim/w); w = maxDim; }
+        else if(h >= w && h > maxDim){ w = Math.round(w*maxDim/h); h = maxDim; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = ()=>reject(new Error('Image illisible'));
+      img.src = reader.result;
+    };
+    reader.onerror = ()=>reject(new Error('Lecture du fichier impossible'));
+    reader.readAsDataURL(file);
+  });
+}
+function readFileAsDataUrl(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=>resolve(reader.result);
+    reader.onerror = ()=>reject(new Error('Lecture du fichier impossible'));
+    reader.readAsDataURL(file);
+  });
+}
+function openAttachmentViewer(att){
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  const isImg = att.type && att.type.startsWith('image/');
+  overlay.innerHTML = `
+    <div class="modal" style="max-width:520px;">
+      <h2>${escapeHtml(att.name)}</h2>
+      ${isImg ? `<img src="${att.dataUrl}" style="width:100%;border-radius:var(--radius);">` : `<a href="${att.dataUrl}" download="${escapeHtml(att.name)}" class="btn primary">Télécharger le fichier</a>`}
+      <div class="modal-actions"><button class="btn ghost" id="close-attach">Fermer</button></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.remove(); });
+  overlay.querySelector('#close-attach').onclick = ()=> overlay.remove();
+}
+
 function openToleModal(existing, prefillZone){
   const editing = !!existing;
-  const t = existing || { id: uid(), ref:'', matiere:'Acier', nuance:'', epaisseur:1, longueur:1000, largeur:1000, qte:1, seuil:1, zone: prefillZone || '', palette:'' };
+  const t = existing || { id: uid(), ref:'', matiere: settings.defaultMatiere || 'Acier', nuance:'', epaisseur: settings.defaultEpaisseur ?? 1, longueur: settings.defaultLongueur ?? 1000, largeur: settings.defaultLargeur ?? 1000, qte:1, seuil: settings.defaultSeuil ?? 1, zone: prefillZone || '', palette:'', secteur:'Autre', attachment: null };
+  let attachment = t.attachment || null;
+
+  const excludeId = editing ? t.id : null;
+  const usedByOthers = [...new Set(toles.filter(x=>x.id!==excludeId && x.palette).map(x=>parseInt(x.palette,10)).filter(n=>!isNaN(n)))].sort((a,b)=>a-b);
+  let nextFree = settings.paletteStart || 1; while(usedByOthers.includes(nextFree)) nextFree++;
+  const currentNum = (t.palette !== '' && t.palette !== undefined && t.palette !== null) ? parseInt(t.palette,10) : null;
+  const paletteNums = new Set(usedByOthers);
+  paletteNums.add(nextFree);
+  if(currentNum !== null) paletteNums.add(currentNum);
+  const sortedPaletteNums = [...paletteNums].sort((a,b)=>a-b);
+  const paletteOptionsHtml = `<option value="" ${currentNum===null?'selected':''}>— Aucune —</option>` +
+    sortedPaletteNums.map(n=>{
+      const label = n===nextFree ? `+ Nouvelle palette (n°${n})` : `Palette n°${n}`;
+      return `<option value="${n}" ${currentNum===n?'selected':''}>${label}</option>`;
+    }).join('');
+
   const overlay = document.createElement('div');
   overlay.className = 'overlay';
   overlay.innerHTML = `
@@ -620,7 +841,18 @@ function openToleModal(existing, prefillZone){
         <div class="field"><label>Épaisseur (mm)</label><input type="number" step="0.1" id="f-ep" value="${t.epaisseur}"></div>
       </div>
       <div class="field"><label>Nuance</label><input type="text" id="f-nuance" value="${escapeHtml(t.nuance||'')}" placeholder="Ex. S235JR, DX51D, 5754, 304L…"></div>
-      <div class="field"><label>N° de palette <span style="text-transform:none;letter-spacing:0;color:var(--ink-dim);font-weight:400;">(pour distinguer 2 palettes de la même matière)</span></label><input type="text" id="f-palette" value="${escapeHtml(t.palette||'')}" placeholder="Ex. P-01, P-02…"></div>
+      <div class="field"><label>Secteur</label><select id="f-secteur">${['Aéronautique','Autre'].map(s=>`<option ${((t.secteur||'Autre')===s)?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="field">
+        <label>Photo / fichier joint <span style="text-transform:none;letter-spacing:0;color:var(--ink-dim);font-weight:400;">(certificat matière, photo de la tôle…)</span></label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="btn ghost small" id="btn-take-photo">📷 Prendre une photo</button>
+          <button type="button" class="btn ghost small" id="btn-choose-file">📎 Choisir un fichier</button>
+          <input type="file" id="f-photo-capture" accept="image/*" capture="environment" style="display:none;">
+          <input type="file" id="f-file-attach" style="display:none;">
+        </div>
+        <div id="attach-preview" style="margin-top:10px;"></div>
+      </div>
+      <div class="field"><label>N° de palette <span style="text-transform:none;letter-spacing:0;color:var(--ink-dim);font-weight:400;">(automatique — se libère quand plus aucune tôle ne l'utilise)</span></label><select id="f-palette">${paletteOptionsHtml}</select></div>
       <div class="grid2">
         <div class="field"><label>Longueur (mm)</label><input type="number" id="f-long" value="${t.longueur}"></div>
         <div class="field"><label>Largeur (mm)</label><input type="number" id="f-larg" value="${t.largeur}"></div>
@@ -673,12 +905,64 @@ function openToleModal(existing, prefillZone){
   });
   if(!editing) recomputeRef();
 
+  function renderAttachPreview(){
+    const el = overlay.querySelector('#attach-preview');
+    if(!attachment){
+      el.innerHTML = `<span class="hint" style="font-size:12px;color:var(--ink-dim);">Aucun fichier joint.</span>`;
+      return;
+    }
+    const isImg = attachment.type && attachment.type.startsWith('image/');
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        ${isImg
+          ? `<img src="${attachment.dataUrl}" style="width:56px;height:56px;object-fit:cover;border-radius:var(--radius);border:1px solid var(--line);">`
+          : `<div style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;background:var(--panel-2);border-radius:var(--radius);border:1px solid var(--line);font-size:20px;">📄</div>`}
+        <div style="flex:1;font-size:12px;color:var(--ink-dim);word-break:break-all;">${escapeHtml(attachment.name)}</div>
+        <button type="button" class="btn ghost small" id="btn-remove-attach">Retirer</button>
+      </div>`;
+    el.querySelector('#btn-remove-attach').onclick = ()=>{ attachment = null; renderAttachPreview(); };
+  }
+  renderAttachPreview();
+
+  overlay.querySelector('#btn-take-photo').onclick = ()=> overlay.querySelector('#f-photo-capture').click();
+  overlay.querySelector('#btn-choose-file').onclick = ()=> overlay.querySelector('#f-file-attach').click();
+
+  overlay.querySelector('#f-photo-capture').onchange = async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    try{
+      const dataUrl = await compressImageFile(file);
+      if(dataUrl.length > 700000){ toast('Photo trop volumineuse même compressée — réessaie.'); return; }
+      attachment = { name: file.name || 'photo.jpg', type: 'image/jpeg', dataUrl };
+      renderAttachPreview();
+    }catch(err){ console.error(err); toast('Impossible de traiter la photo'); }
+    e.target.value = '';
+  };
+
+  overlay.querySelector('#f-file-attach').onchange = async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    try{
+      let dataUrl;
+      if(file.type && file.type.startsWith('image/')){
+        dataUrl = await compressImageFile(file);
+      }else{
+        dataUrl = await readFileAsDataUrl(file);
+      }
+      if(dataUrl.length > 700000){ toast('Fichier trop volumineux (limite ~500 Ko) — choisis un fichier plus léger.'); return; }
+      attachment = { name: file.name, type: file.type || 'application/octet-stream', dataUrl };
+      renderAttachPreview();
+    }catch(err){ console.error(err); toast('Impossible de lire ce fichier'); }
+    e.target.value = '';
+  };
+
   overlay.querySelector('#save-tole').onclick = async ()=>{
     const ref = overlay.querySelector('#f-ref').value.trim();
     if(!ref){ toast('La référence est requise'); return; }
     t.ref = ref;
     t.matiere = overlay.querySelector('#f-matiere').value;
     t.nuance = overlay.querySelector('#f-nuance').value.trim();
+    t.secteur = overlay.querySelector('#f-secteur').value;
     t.palette = overlay.querySelector('#f-palette').value.trim();
     t.epaisseur = parseFloat(overlay.querySelector('#f-ep').value) || 0;
     t.longueur = parseInt(overlay.querySelector('#f-long').value) || 0;
@@ -686,6 +970,7 @@ function openToleModal(existing, prefillZone){
     t.qte = parseInt(overlay.querySelector('#f-qte').value) || 0;
     t.seuil = parseInt(overlay.querySelector('#f-seuil').value) || 0;
     t.zone = overlay.querySelector('#f-zone').value;
+    t.attachment = attachment;
     const now = new Date().toISOString();
     if(!editing){
       t.dateCreation = now;
@@ -916,7 +1201,7 @@ function printToleTag(t){
       <div class="pname">${escapeHtml(t.matiere)}${t.nuance ? ' · ' + escapeHtml(t.nuance) : ''}</div>
       <table style="width:100%;font-size:19px;border-collapse:collapse;margin-top:16px;">
         <tr><td style="padding:7px 0;color:#555;">Nuance</td><td style="padding:7px 0;text-align:right;font-weight:600;">${t.nuance ? escapeHtml(t.nuance) : '—'}</td></tr>
-        <tr><td style="padding:7px 0;color:#555;">Palette</td><td style="padding:7px 0;text-align:right;font-weight:600;">${t.palette ? escapeHtml(t.palette) : '—'}</td></tr>
+        <tr><td style="padding:7px 0;color:#555;">Palette</td><td style="padding:7px 0;text-align:right;font-weight:600;">${t.palette ? 'N°'+escapeHtml(t.palette) : '—'}</td></tr>
         <tr><td style="padding:7px 0;color:#555;">Épaisseur</td><td style="padding:7px 0;text-align:right;font-weight:600;">${t.epaisseur} mm</td></tr>
         <tr><td style="padding:7px 0;color:#555;">Dimensions</td><td style="padding:7px 0;text-align:right;font-weight:600;">${t.longueur}×${t.largeur} mm</td></tr>
         <tr><td style="padding:7px 0;color:#555;">Zone</td><td style="padding:7px 0;text-align:right;font-weight:600;">${t.zone ? escapeHtml(t.zone) : '—'}</td></tr>
@@ -933,6 +1218,690 @@ function printToleTag(t){
 --------------------------------------------------------- */
 let scanResultZone = null;
 let scanNotFoundCode = null;
+
+function renderParametres(){
+  const view = document.getElementById('view');
+  view.innerHTML = `
+    <header class="page">
+      <div>
+        <div class="eyebrow">Réglages</div>
+        <h1>Paramètres</h1>
+        <div class="lede">Valeurs par défaut utilisées à la création d'une nouvelle tôle.</div>
+      </div>
+    </header>
+
+    <div class="modal" style="max-width:520px;margin:0;box-shadow:none;">
+      <div class="field">
+        <label>Numéro de palette de départ <span style="text-transform:none;letter-spacing:0;color:var(--ink-dim);font-weight:400;">(la numérotation automatique ne descendra jamais en dessous)</span></label>
+        <input type="number" id="s-palette-start" min="1" value="${settings.paletteStart}">
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Longueur par défaut (mm)</label><input type="number" id="s-def-long" value="${settings.defaultLongueur}"></div>
+        <div class="field"><label>Largeur par défaut (mm)</label><input type="number" id="s-def-larg" value="${settings.defaultLargeur}"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Épaisseur par défaut (mm)</label><input type="number" step="0.1" id="s-def-ep" value="${settings.defaultEpaisseur}"></div>
+        <div class="field"><label>Seuil d'alerte par défaut</label><input type="number" id="s-def-seuil" value="${settings.defaultSeuil}"></div>
+      </div>
+      <div class="field">
+        <label>Matière par défaut</label>
+        <select id="s-def-matiere">
+          ${['Acier','Acier galvanisé','Inox','Aluminium','Cuivre','Autre'].map(m=>`<option ${settings.defaultMatiere===m?'selected':''}>${m}</option>`).join('')}
+        </select>
+      </div>
+      <div class="modal-actions" style="justify-content:flex-start;">
+        <button class="btn primary" id="save-settings">Enregistrer les paramètres</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('save-settings').onclick = async ()=>{
+    settings.paletteStart = Math.max(1, parseInt(document.getElementById('s-palette-start').value) || 1);
+    settings.defaultLongueur = parseInt(document.getElementById('s-def-long').value) || 0;
+    settings.defaultLargeur = parseInt(document.getElementById('s-def-larg').value) || 0;
+    settings.defaultEpaisseur = parseFloat(document.getElementById('s-def-ep').value) || 0;
+    settings.defaultSeuil = parseInt(document.getElementById('s-def-seuil').value) || 0;
+    settings.defaultMatiere = document.getElementById('s-def-matiere').value;
+    await saveSettings();
+    toast('Paramètres enregistrés');
+  };
+}
+
+/* ---------------------------------------------------------
+   IMBRICATION
+--------------------------------------------------------- */
+let nestSheet = { longueur: 2000, largeur: 1000 };
+let nestGap = 5;
+let nestParts = []; // { id, nom, longueur, largeur, qte, source }
+
+function parseDxfBoundingBox(text){
+  const parser = new DxfParser();
+  const dxf = parser.parseSync(text);
+  let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+  function pt(x,y){ if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y; }
+  (dxf.entities||[]).forEach(e=>{
+    if(e.vertices){ e.vertices.forEach(v=>pt(v.x,v.y)); }
+    if(e.startPoint) pt(e.startPoint.x, e.startPoint.y);
+    if(e.endPoint) pt(e.endPoint.x, e.endPoint.y);
+    if(e.center && e.radius!=null){ pt(e.center.x-e.radius, e.center.y-e.radius); pt(e.center.x+e.radius, e.center.y+e.radius); }
+    if(e.position) pt(e.position.x, e.position.y);
+  });
+  if(!isFinite(minX)) throw new Error('Aucune géométrie exploitable trouvée dans le DXF.');
+  return { longueur: Math.round(maxX-minX), largeur: Math.round(maxY-minY) };
+}
+
+/* Table de tous les CARTESIAN_POINT du fichier STEP, indexée par identifiant #id.
+   Partagée par les deux lecteurs STEP approximatifs de l'application. */
+function stepCartesianPoints(text){
+  const re = /#(\d+)\s*=\s*CARTESIAN_POINT\s*\(\s*'[^']*'\s*,\s*\(([^)]+)\)\s*\)/g;
+  const pts = {};
+  let m;
+  while((m = re.exec(text))){
+    const vals = m[2].split(',').map(s=>parseFloat(s.trim()));
+    if(vals.length>=2 && vals.every(isFinite)) pts[m[1]] = vals;
+  }
+  return pts;
+}
+
+function parseStepBoundingBoxApprox(text){
+  const pts = stepCartesianPoints(text);
+  // On ne garde que les points réellement utilisés comme sommets de la pièce (VERTEX_POINT) :
+  // les CARTESIAN_POINT bruts incluent aussi les origines de repères (AXIS2_PLACEMENT_3D) et les
+  // points de construction des courbes, qui faussent complètement la boîte englobante (souvent
+  // un point à l'origine (0,0,0) du repère global, très loin de la pièce elle-même).
+  const vertexRe = /VERTEX_POINT\s*\(\s*'[^']*'\s*,\s*#(\d+)\s*\)/g;
+  let m, minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity, found=0;
+  while((m = vertexRe.exec(text))){
+    const v = pts[m[1]];
+    if(!v) continue;
+    found++;
+    if(v[0]<minX)minX=v[0]; if(v[0]>maxX)maxX=v[0];
+    if(v[1]<minY)minY=v[1]; if(v[1]>maxY)maxY=v[1];
+  }
+  if(!found){
+    Object.values(pts).forEach(v=>{
+      if(v[0]<minX)minX=v[0]; if(v[0]>maxX)maxX=v[0];
+      if(v[1]<minY)minY=v[1]; if(v[1]>maxY)maxY=v[1];
+    });
+  }
+  if(!isFinite(minX)) throw new Error('Aucun point exploitable trouvé dans le fichier STEP.');
+  return { longueur: Math.round(maxX-minX), largeur: Math.round(maxY-minY) };
+}
+
+/* Algorithme MaxRects (Maximal Rectangles, Best-Short-Side-Fit) avec rotation 90°,
+   nettement plus performant qu'un simple rangement par rangées. */
+function packMaxRects(sheetL, sheetW, units, gap){
+  let freeRects = [{x:0, y:0, w:sheetL, h:sheetW}];
+  const placed = [];
+  const unplaced = [];
+
+  function isContainedIn(a,b){
+    return a.x>=b.x && a.y>=b.y && a.x+a.w<=b.x+b.w && a.y+a.h<=b.y+b.h;
+  }
+  function pruneFreeList(){
+    for(let i=0;i<freeRects.length;i++){
+      for(let j=i+1;j<freeRects.length;j++){
+        if(isContainedIn(freeRects[i], freeRects[j])){ freeRects.splice(i,1); i--; break; }
+        if(isContainedIn(freeRects[j], freeRects[i])){ freeRects.splice(j,1); j--; }
+      }
+    }
+  }
+  function splitFreeNode(fr, used){
+    if(used.x >= fr.x+fr.w || used.x+used.w <= fr.x || used.y >= fr.y+fr.h || used.y+used.h <= fr.y) return null;
+    const out = [];
+    if(used.x > fr.x) out.push({x:fr.x, y:fr.y, w:used.x-fr.x, h:fr.h});
+    if(used.x+used.w < fr.x+fr.w) out.push({x:used.x+used.w, y:fr.y, w:fr.x+fr.w-(used.x+used.w), h:fr.h});
+    if(used.y > fr.y) out.push({x:fr.x, y:fr.y, w:fr.w, h:used.y-fr.y});
+    if(used.y+used.h < fr.y+fr.h) out.push({x:fr.x, y:used.y+used.h, w:fr.w, h:fr.y+fr.h-(used.y+used.h)});
+    return out;
+  }
+  function findPosition(w, h){
+    let bestShort=Infinity, bestLong=Infinity, best=null, bestRotated=false;
+    freeRects.forEach(fr=>{
+      if(fr.w >= w && fr.h >= h){
+        const sf = Math.min(fr.w-w, fr.h-h), lf = Math.max(fr.w-w, fr.h-h);
+        if(sf < bestShort || (sf===bestShort && lf<bestLong)){ bestShort=sf; bestLong=lf; best={x:fr.x,y:fr.y,w,h}; bestRotated=false; }
+      }
+      if(fr.w >= h && fr.h >= w){
+        const sf = Math.min(fr.w-h, fr.h-w), lf = Math.max(fr.w-h, fr.h-w);
+        if(sf < bestShort || (sf===bestShort && lf<bestLong)){ bestShort=sf; bestLong=lf; best={x:fr.x,y:fr.y,w:h,h:w}; bestRotated=true; }
+      }
+    });
+    return best ? {rect:best, rotated:bestRotated} : null;
+  }
+
+  units.forEach(u=>{
+    const gw = u.w + gap, gh = u.h + gap;
+    const found = findPosition(gw, gh);
+    if(!found){ unplaced.push(u); return; }
+    const node = found.rect;
+    placed.push({ nom:u.nom, x:node.x, y:node.y, w: found.rotated ? u.h : u.w, h: found.rotated ? u.w : u.h, rotated: found.rotated });
+    const numFree = freeRects.length;
+    for(let i=0;i<numFree;i++){
+      const splits = splitFreeNode(freeRects[i], node);
+      if(splits){ freeRects.splice(i,1); i--; freeRects.push(...splits); }
+    }
+    pruneFreeList();
+  });
+
+  return { placed, unplaced };
+}
+
+function estimateMaxUnitsCount(partL, partW, sheetL, sheetW, gap){
+  const area = (partL+gap)*(partW+gap);
+  if(area<=0 || partL<=0 || partW<=0) return 0;
+  return Math.min(3000, Math.ceil((sheetL*sheetW)/area) + 4);
+}
+
+function calcMaxPourPiece(p){
+  const sheetL = nestSheet.longueur, sheetW = nestSheet.largeur, gap = nestGap;
+  const n = estimateMaxUnitsCount(p.longueur, p.largeur, sheetL, sheetW, gap);
+  if(n<=0) return 0;
+  const units = Array.from({length:n}, ()=>({nom:p.nom, w:p.longueur, h:p.largeur}));
+  const result = packMaxRects(sheetL, sheetW, units, gap);
+  return result.placed.length;
+}
+
+function nestCompute(){
+  const sheetL = nestSheet.longueur, sheetW = nestSheet.largeur, gap = nestGap;
+  const baseUnits = [];
+  nestParts.forEach(p=>{
+    for(let i=0;i<p.qte;i++) baseUnits.push({ partId:p.id, nom:p.nom, l:p.longueur, w:p.largeur });
+  });
+
+  // On essaie plusieurs stratégies de tri et on garde la meilleure imbrication obtenue.
+  const strategies = [
+    (a,b)=> (b.l*b.w) - (a.l*a.w),                 // surface décroissante
+    (a,b)=> Math.max(b.l,b.w) - Math.max(a.l,a.w), // plus grand côté décroissant
+    (a,b)=> Math.min(b.l,b.w) - Math.min(a.l,a.w), // plus petit côté décroissant
+    (a,b)=> (b.l+b.w) - (a.l+a.w),                 // périmètre décroissant
+  ];
+
+  let best = null;
+  strategies.forEach(cmp=>{
+    const normalized = baseUnits.slice().sort(cmp).map(u=>({ nom:u.nom, w:u.l, h:u.w }));
+    const result = packMaxRects(sheetL, sheetW, normalized, gap);
+    const surfaceUtile = result.placed.reduce((s,p)=>s+p.w*p.h,0);
+    const score = result.placed.length*1e9 + surfaceUtile; // priorité : nb de pièces placées, puis surface utilisée
+    if(!best || score > best.score){ best = { ...result, score }; }
+  });
+
+  const surfaceFeuille = sheetL * sheetW;
+  const surfaceUtile = best.placed.reduce((s,p)=>s+p.w*p.h,0);
+  const taux = surfaceFeuille>0 ? Math.round(surfaceUtile/surfaceFeuille*1000)/10 : 0;
+  return { placed: best.placed, unplaced: best.unplaced, taux, totalDemande: baseUnits.length };
+}
+
+
+function renderImbrication(){
+  const view = document.getElementById('view');
+  view.innerHTML = `
+    <header class="page">
+      <div>
+        <div class="eyebrow">Découpe</div>
+        <h1>Imbrication</h1>
+        <div class="lede">Place tes pièces (lues depuis un fichier DXF ou STEP) sur une tôle aux dimensions de ton choix.</div>
+      </div>
+    </header>
+
+    <div class="modal" style="max-width:640px;margin:0 0 24px;box-shadow:none;">
+      <div class="grid2">
+        <div class="field"><label>Longueur de la tôle (mm)</label><input type="number" id="nest-sheet-l" value="${nestSheet.longueur}"></div>
+        <div class="field"><label>Largeur de la tôle (mm)</label><input type="number" id="nest-sheet-w" value="${nestSheet.largeur}"></div>
+      </div>
+      <div class="field"><label>Espacement entre pièces (mm)</label><input type="number" id="nest-gap" value="${nestGap}" min="0"></div>
+
+      <div class="field">
+        <label>Ajouter une pièce depuis un fichier DXF ou STEP</label>
+        <input type="file" id="nest-file" accept=".dxf,.step,.stp">
+        <span class="hint" id="nest-file-hint" style="font-size:11px;color:var(--ink-dim);display:block;margin-top:4px;">Le DXF donne le contour réel (précis). Le STEP est lu de façon approximative (boîte englobante à partir des points 3D) — vérifie les dimensions obtenues.</span>
+      </div>
+
+      <div class="modal-actions" style="justify-content:flex-start;">
+        <button class="btn" id="nest-add-manual">+ Ajouter une pièce manuellement</button>
+      </div>
+
+      ${nestParts.length ? `
+        <div class="table-wrap" style="margin-top:16px;">
+        <table>
+          <thead><tr><th>Pièce</th><th>Longueur</th><th>Largeur</th><th>Qté</th><th>Max sur la tôle</th><th></th></tr></thead>
+          <tbody>
+            ${nestParts.map(p=>{
+              const maxP = calcMaxPourPiece(p);
+              return `
+              <tr>
+                <td><input type="text" data-nest-field="nom" data-nest-id="${p.id}" value="${escapeHtml(p.nom)}" style="width:100%;"></td>
+                <td><input type="number" data-nest-field="longueur" data-nest-id="${p.id}" value="${p.longueur}" style="width:80px;"></td>
+                <td><input type="number" data-nest-field="largeur" data-nest-id="${p.id}" value="${p.largeur}" style="width:80px;"></td>
+                <td><input type="number" data-nest-field="qte" data-nest-id="${p.id}" value="${p.qte}" min="1" style="width:60px;"></td>
+                <td><span class="dim">${maxP}</span> <button class="btn ghost small" data-nest-usemax="${p.id}" data-nest-max="${maxP}">Utiliser</button></td>
+                <td><div class="row-actions"><button class="btn ghost small" data-nest-remove="${p.id}">Retirer</button></div></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+        </div>
+        <div class="hint" style="font-size:11px;color:var(--ink-dim);margin-top:6px;">"Max sur la tôle" = nombre maximum de cette pièce seule sur une tôle vierge (calculé automatiquement). Clique "Utiliser" pour remplir la quantité avec ce nombre.</div>
+      ` : `<div class="empty" style="margin-top:14px;padding:24px;"><b>Aucune pièce ajoutée</b>Charge un fichier ou ajoute une pièce manuellement.</div>`}
+
+      <div class="modal-actions" style="justify-content:flex-start;">
+        <button class="btn primary" id="nest-calc" ${nestParts.length?'':'disabled'}>Calculer l'imbrication</button>
+      </div>
+    </div>
+
+    <div id="nest-result"></div>
+  `;
+
+  document.getElementById('nest-sheet-l').onchange = (e)=>{ nestSheet.longueur = parseInt(e.target.value)||2000; renderImbrication(); };
+  document.getElementById('nest-sheet-w').onchange = (e)=>{ nestSheet.largeur = parseInt(e.target.value)||1000; renderImbrication(); };
+  document.getElementById('nest-gap').onchange = (e)=>{ nestGap = parseInt(e.target.value)||0; renderImbrication(); };
+
+  document.getElementById('nest-file').onchange = async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const ext = file.name.split('.').pop().toLowerCase();
+    try{
+      const text = await file.text();
+      let dims;
+      if(ext === 'dxf'){
+        dims = parseDxfBoundingBox(text);
+      }else{
+        dims = parseStepBoundingBoxApprox(text);
+      }
+      nestParts.push({ id: uid(), nom: file.name.replace(/\.(dxf|step|stp)$/i,''), longueur: dims.longueur, largeur: dims.largeur, qte: 1, source: ext });
+      toast(`Pièce ajoutée : ${dims.longueur} × ${dims.largeur} mm`);
+      renderImbrication();
+    }catch(err){
+      console.error(err);
+      toast('Impossible de lire ce fichier : ' + err.message);
+    }
+  };
+
+  document.getElementById('nest-add-manual').onclick = ()=>{
+    nestParts.push({ id: uid(), nom: 'Pièce', longueur: 300, largeur: 200, qte: 1, source: 'manuel' });
+    renderImbrication();
+  };
+
+  view.querySelectorAll('[data-nest-remove]').forEach(btn=>{
+    btn.onclick = ()=>{ nestParts = nestParts.filter(p=>p.id!==btn.dataset.nestRemove); renderImbrication(); };
+  });
+  view.querySelectorAll('[data-nest-usemax]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const p = nestParts.find(x=>x.id===btn.dataset.nestUsemax);
+      if(p){ p.qte = Math.max(1, parseInt(btn.dataset.nestMax)||1); renderImbrication(); }
+    };
+  });
+  view.querySelectorAll('[data-nest-field]').forEach(inp=>{
+    inp.onchange = ()=>{
+      const p = nestParts.find(x=>x.id===inp.dataset.nestId);
+      if(!p) return;
+      const f = inp.dataset.nestField;
+      p[f] = (f==='nom') ? inp.value : (parseInt(inp.value)||0);
+      renderImbrication();
+    };
+  });
+
+  document.getElementById('nest-calc').onclick = ()=>{
+    const result = nestCompute();
+    renderNestResult(result);
+  };
+}
+
+function renderNestResult(result){
+  const el = document.getElementById('nest-result');
+  const sheetL = nestSheet.longueur, sheetW = nestSheet.largeur;
+  const scale = Math.min(760/sheetL, 420/sheetW);
+  const svgParts = result.placed.map(p=>`
+    <rect x="${p.x*scale}" y="${p.y*scale}" width="${p.w*scale}" height="${p.h*scale}" fill="rgba(91,147,179,0.35)" stroke="var(--blue)" stroke-width="1"/>
+    <text x="${(p.x+p.w/2)*scale}" y="${(p.y+p.h/2)*scale}" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="var(--ink)">${escapeHtml(p.nom)}${p.rotated?' ↻':''}</text>
+  `).join('');
+
+  el.innerHTML = `
+    <div class="modal" style="max-width:800px;margin:0;box-shadow:none;">
+      <div class="grid2" style="margin-bottom:16px;">
+        <div class="result-card"><div style="font-family:var(--display);font-size:26px;color:var(--ink);">${result.placed.length}/${result.totalDemande}</div><div style="font-size:12px;color:var(--ink-dim);margin-top:4px;">pièces placées</div></div>
+        <div class="result-card"><div style="font-family:var(--display);font-size:26px;color:var(--ink);">${result.taux}%</div><div style="font-size:12px;color:var(--ink-dim);margin-top:4px;">taux d'utilisation</div></div>
+      </div>
+      ${result.unplaced.length ? `<div style="color:var(--danger);margin-bottom:10px;font-size:13px;">${result.unplaced.length} pièce(s) ne rentrent pas sur cette tôle — augmente ses dimensions ou réduis les quantités.</div>` : ''}
+      <div style="overflow-x:auto;">
+        <svg width="${sheetL*scale}" height="${sheetW*scale}" style="background:#fff;border:1px solid var(--line);">
+          <rect x="0" y="0" width="${sheetL*scale}" height="${sheetW*scale}" fill="#fff" stroke="var(--ink-dim)"/>
+          ${svgParts}
+        </svg>
+      </div>
+      <div class="modal-actions" style="justify-content:flex-start;">
+        <button class="btn" onclick="window.print()">Imprimer le plan</button>
+      </div>
+    </div>
+  `;
+}
+
+/* ---------------------------------------------------------
+   DÉCOUPE LASER — lecture DXF, longueur de coupe et temps estimé
+--------------------------------------------------------- */
+let laserParams = { vitesse: 3000, tempsPercage: 0.5, vitesseRapide: 15000, matiere: 'Acier', epaisseur: 3 };
+let laserResult = null;
+let laserFileName = '';
+
+const LASER_PRESETS = {
+  'Acier':      { 1: 6000, 2: 4000, 3: 3000, 5: 1800, 8: 1000 },
+  'Inox':       { 1: 5000, 2: 3000, 3: 2000 },
+  'Aluminium':  { 1: 4000, 2: 2500, 3: 1500 },
+};
+
+function dist(x1,y1,x2,y2){ return Math.hypot(x2-x1, y2-y1); }
+
+function analyzeDxfForLaser(text){
+  const parser = new DxfParser();
+  const dxf = parser.parseSync(text);
+  const entities = dxf.entities || [];
+  let totalLength = 0;
+  let pierces = 0;
+  let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+  function bboxPt(x,y){ if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y; }
+
+  entities.forEach(e=>{
+    if(e.type === 'LINE' && e.vertices && e.vertices.length>=2){
+      totalLength += dist(e.vertices[0].x,e.vertices[0].y,e.vertices[1].x,e.vertices[1].y);
+      e.vertices.forEach(v=>bboxPt(v.x,v.y));
+      pierces++;
+    }
+    else if((e.type === 'LWPOLYLINE' || e.type === 'POLYLINE') && e.vertices && e.vertices.length>1){
+      for(let i=0;i<e.vertices.length-1;i++){
+        totalLength += dist(e.vertices[i].x,e.vertices[i].y,e.vertices[i+1].x,e.vertices[i+1].y);
+      }
+      if(e.shape || e.closed){
+        totalLength += dist(e.vertices[e.vertices.length-1].x,e.vertices[e.vertices.length-1].y,e.vertices[0].x,e.vertices[0].y);
+      }
+      e.vertices.forEach(v=>bboxPt(v.x,v.y));
+      pierces++;
+    }
+    else if(e.type === 'CIRCLE' && e.center && e.radius){
+      totalLength += 2*Math.PI*e.radius;
+      bboxPt(e.center.x-e.radius, e.center.y-e.radius); bboxPt(e.center.x+e.radius, e.center.y+e.radius);
+      pierces++;
+    }
+    else if(e.type === 'ARC' && e.center && e.radius!=null){
+      let a1 = e.startAngle, a2 = e.endAngle;
+      let sweep = a2 - a1;
+      if(sweep < 0) sweep += 2*Math.PI;
+      totalLength += e.radius * sweep;
+      bboxPt(e.center.x-e.radius, e.center.y-e.radius); bboxPt(e.center.x+e.radius, e.center.y+e.radius);
+      pierces++;
+    }
+    else if(e.type === 'SPLINE' && e.controlPoints && e.controlPoints.length>1){
+      for(let i=0;i<e.controlPoints.length-1;i++){
+        totalLength += dist(e.controlPoints[i].x,e.controlPoints[i].y,e.controlPoints[i+1].x,e.controlPoints[i+1].y);
+      }
+      e.controlPoints.forEach(v=>bboxPt(v.x,v.y));
+      pierces++;
+    }
+    else if(e.type === 'ELLIPSE' && e.center && e.majorAxisEndPoint){
+      const a = Math.hypot(e.majorAxisEndPoint.x, e.majorAxisEndPoint.y);
+      const b = a * (e.axisRatio || 1);
+      totalLength += Math.PI*(3*(a+b) - Math.sqrt((3*a+b)*(a+3*b))); // approximation de Ramanujan
+      bboxPt(e.center.x-a, e.center.y-a); bboxPt(e.center.x+a, e.center.y+a);
+      pierces++;
+    }
+  });
+
+  if(pierces === 0) throw new Error('Aucune géométrie de découpe exploitable trouvée dans ce DXF.');
+  const bbox = isFinite(minX) ? { minX, minY, maxX, maxY } : { minX:0, minY:0, maxX:0, maxY:0 };
+  return { totalLength, pierces, entities, bbox };
+}
+
+function buildDxfSvg(entities, bbox){
+  const w = Math.max(1, bbox.maxX - bbox.minX);
+  const h = Math.max(1, bbox.maxY - bbox.minY);
+  const pad = Math.max(w,h) * 0.04;
+  const vbW = w+pad*2, vbH = h+pad*2;
+  // Convertit un point DXF (Y vers le haut) en coordonnées SVG (Y vers le bas)
+  function sx(x){ return (x - bbox.minX + pad); }
+  function sy(y){ return vbH - (y - bbox.minY + pad); }
+
+  let paths = '';
+  entities.forEach(e=>{
+    if(e.type === 'LINE' && e.vertices && e.vertices.length>=2){
+      paths += `<line x1="${sx(e.vertices[0].x)}" y1="${sy(e.vertices[0].y)}" x2="${sx(e.vertices[1].x)}" y2="${sy(e.vertices[1].y)}"/>`;
+    }
+    else if((e.type === 'LWPOLYLINE' || e.type === 'POLYLINE') && e.vertices && e.vertices.length>1){
+      const pts = e.vertices.map(v=>`${sx(v.x)},${sy(v.y)}`).join(' ');
+      paths += (e.shape || e.closed) ? `<polygon points="${pts}"/>` : `<polyline points="${pts}"/>`;
+    }
+    else if(e.type === 'CIRCLE' && e.center && e.radius){
+      paths += `<circle cx="${sx(e.center.x)}" cy="${sy(e.center.y)}" r="${e.radius}"/>`;
+    }
+    else if(e.type === 'ARC' && e.center && e.radius!=null){
+      let a1=e.startAngle, a2=e.endAngle, sweep=a2-a1; if(sweep<0) sweep+=2*Math.PI;
+      const x1 = e.center.x + e.radius*Math.cos(a1), y1 = e.center.y + e.radius*Math.sin(a1);
+      const x2 = e.center.x + e.radius*Math.cos(a2), y2 = e.center.y + e.radius*Math.sin(a2);
+      const large = sweep > Math.PI ? 1 : 0;
+      paths += `<path d="M ${sx(x1)} ${sy(y1)} A ${e.radius} ${e.radius} 0 ${large} 0 ${sx(x2)} ${sy(y2)}"/>`;
+    }
+    else if(e.type === 'SPLINE' && e.controlPoints && e.controlPoints.length>1){
+      const pts = e.controlPoints.map(v=>`${sx(v.x)},${sy(v.y)}`).join(' ');
+      paths += `<polyline points="${pts}"/>`;
+    }
+    else if(e.type === 'ELLIPSE' && e.center && e.majorAxisEndPoint){
+      const a = Math.hypot(e.majorAxisEndPoint.x, e.majorAxisEndPoint.y);
+      const b = a * (e.axisRatio || 1);
+      paths += `<ellipse cx="${sx(e.center.x)}" cy="${sy(e.center.y)}" rx="${a}" ry="${b}"/>`;
+    }
+  });
+
+  const strokeW = Math.max(w,h) * 0.0025;
+  return `<svg width="100%" height="100%" viewBox="0 0 ${vbW} ${vbH}" preserveAspectRatio="xMidYMid meet" style="background:#fff;display:block;">
+    <g fill="none" stroke="#1a1a1a" stroke-width="${strokeW}">${paths}</g>
+  </svg>`;
+}
+
+/* Rend un viewer DXF zoomable/déplaçable dans le conteneur #containerId.
+   Molette = zoom (centré sur le curseur), glisser = déplacer, pincement 2 doigts = zoom tactile. */
+function attachDxfZoomPan(containerId){
+  const container = document.getElementById(containerId);
+  if(!container) return;
+  const svg = container.querySelector('svg');
+  if(!svg) return;
+
+  let scale = 1, tx = 0, ty = 0;
+  const MIN_SCALE = 0.2, MAX_SCALE = 20;
+
+  function apply(){
+    svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+  }
+
+  function zoomAt(cx, cy, factor){
+    const newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale * factor));
+    const ratio = newScale / scale;
+    tx = cx - (cx - tx) * ratio;
+    ty = cy - (cy - ty) * ratio;
+    scale = newScale;
+    apply();
+  }
+
+  function reset(){ scale = 1; tx = 0; ty = 0; apply(); }
+  reset();
+
+  container.addEventListener('wheel', (e)=>{
+    e.preventDefault();
+    const rect = container.getBoundingClientRect();
+    const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+    const factor = e.deltaY < 0 ? 1.15 : 1/1.15;
+    zoomAt(cx, cy, factor);
+  }, { passive:false });
+
+  // Glisser à la souris
+  let dragging = false, lastX=0, lastY=0;
+  container.addEventListener('mousedown', (e)=>{
+    dragging = true; lastX = e.clientX; lastY = e.clientY;
+    container.classList.add('dragging');
+  });
+  window.addEventListener('mousemove', (e)=>{
+    if(!dragging) return;
+    tx += e.clientX - lastX; ty += e.clientY - lastY;
+    lastX = e.clientX; lastY = e.clientY;
+    apply();
+  });
+  window.addEventListener('mouseup', ()=>{ dragging = false; container.classList.remove('dragging'); });
+
+  // Tactile : un doigt = déplacer, deux doigts = pincer pour zoomer
+  let touchMode = null, lastTouchDist = 0, lastTouchMid = {x:0,y:0};
+  container.addEventListener('touchstart', (e)=>{
+    if(e.touches.length === 1){
+      touchMode = 'pan';
+      lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+    }else if(e.touches.length === 2){
+      touchMode = 'pinch';
+      const [t1,t2] = e.touches;
+      lastTouchDist = Math.hypot(t2.clientX-t1.clientX, t2.clientY-t1.clientY);
+      const rect = container.getBoundingClientRect();
+      lastTouchMid = { x:(t1.clientX+t2.clientX)/2 - rect.left, y:(t1.clientY+t2.clientY)/2 - rect.top };
+    }
+  }, { passive:true });
+  container.addEventListener('touchmove', (e)=>{
+    if(touchMode === 'pan' && e.touches.length === 1){
+      const dx = e.touches[0].clientX - lastX, dy = e.touches[0].clientY - lastY;
+      tx += dx; ty += dy;
+      lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+      apply();
+    }else if(touchMode === 'pinch' && e.touches.length === 2){
+      const [t1,t2] = e.touches;
+      const dist = Math.hypot(t2.clientX-t1.clientX, t2.clientY-t1.clientY);
+      if(lastTouchDist > 0){ zoomAt(lastTouchMid.x, lastTouchMid.y, dist/lastTouchDist); }
+      lastTouchDist = dist;
+    }
+    e.preventDefault();
+  }, { passive:false });
+  container.addEventListener('touchend', ()=>{ touchMode = null; lastTouchDist = 0; });
+
+  container.querySelector('[data-zoom-in]')?.addEventListener('click', ()=>{
+    const rect = container.getBoundingClientRect();
+    zoomAt(rect.width/2, rect.height/2, 1.3);
+  });
+  container.querySelector('[data-zoom-out]')?.addEventListener('click', ()=>{
+    const rect = container.getBoundingClientRect();
+    zoomAt(rect.width/2, rect.height/2, 1/1.3);
+  });
+  container.querySelector('[data-zoom-reset]')?.addEventListener('click', reset);
+}
+
+
+function laserCompute(){
+  if(!laserResult) return null;
+  const v = laserParams.vitesse || 1;
+  const tempsCoupeMin = laserResult.totalLength / v;
+  const tempsPercageMin = (laserResult.pierces * laserParams.tempsPercage) / 60;
+  const tempsTotalMin = tempsCoupeMin + tempsPercageMin;
+  return { tempsCoupeMin, tempsPercageMin, tempsTotalMin };
+}
+
+function fmtMin(min){
+  const totalSec = Math.round(min*60);
+  const m = Math.floor(totalSec/60), s = totalSec%60;
+  return `${m} min ${String(s).padStart(2,'0')} s`;
+}
+
+function renderDecoupeLaser(){
+  const view = document.getElementById('view');
+  const calc = laserCompute();
+  view.innerHTML = `
+    <header class="page">
+      <div>
+        <div class="eyebrow">Découpe</div>
+        <h1>Découpe laser</h1>
+        <div class="lede">Charge un fichier DXF pour estimer la longueur de coupe, le nombre de perçages et le temps de découpe.</div>
+      </div>
+    </header>
+
+    <div class="modal" style="max-width:640px;margin:0 0 24px;box-shadow:none;">
+      <div class="field">
+        <label>Fichier DXF</label>
+        <input type="file" id="laser-file" accept=".dxf">
+        ${laserFileName ? `<span class="hint" style="font-size:11px;color:var(--ink-dim);display:block;margin-top:4px;">Fichier chargé : ${escapeHtml(laserFileName)}</span>` : ''}
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label>Matière</label>
+          <select id="laser-matiere">
+            ${Object.keys(LASER_PRESETS).map(m=>`<option value="${escapeHtml(m)}" ${laserParams.matiere===m?'selected':''}>${escapeHtml(m)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>Épaisseur (mm) <span style="text-transform:none;letter-spacing:0;color:var(--ink-dim);font-weight:400;">(vitesses indicatives — ajuste selon ta machine)</span></label>
+          <select id="laser-epaisseur">
+            ${Object.keys(LASER_PRESETS[laserParams.matiere]).map(ep=>`<option value="${ep}" ${String(laserParams.epaisseur)===ep?'selected':''}>${ep} mm</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="field"><label>Vitesse de coupe (mm/min)</label><input type="number" id="laser-vitesse" value="${laserParams.vitesse}" min="1"></div>
+        <div class="field"><label>Temps de perçage (s / perçage)</label><input type="number" step="0.1" id="laser-percage" value="${laserParams.tempsPercage}" min="0"></div>
+      </div>
+    </div>
+
+    ${laserResult ? `
+      <div class="modal" style="max-width:640px;margin:0;box-shadow:none;">
+        <div class="grid2" style="margin-bottom:16px;">
+          <div class="result-card"><div style="font-family:var(--display);font-size:22px;color:var(--ink);">${(laserResult.totalLength/1000).toFixed(2)} m</div><div style="font-size:12px;color:var(--ink-dim);margin-top:4px;">longueur totale de découpe</div></div>
+          <div class="result-card"><div style="font-family:var(--display);font-size:22px;color:var(--ink);">${laserResult.pierces}</div><div style="font-size:12px;color:var(--ink-dim);margin-top:4px;">perçages (nombre de contours)</div></div>
+        </div>
+        <div class="grid2" style="margin-bottom:16px;">
+          <div class="result-card"><div style="font-family:var(--display);font-size:22px;color:var(--ink);">${fmtMin(calc.tempsCoupeMin)}</div><div style="font-size:12px;color:var(--ink-dim);margin-top:4px;">temps de coupe</div></div>
+          <div class="result-card"><div style="font-family:var(--display);font-size:22px;color:var(--ink);">${fmtMin(calc.tempsPercageMin)}</div><div style="font-size:12px;color:var(--ink-dim);margin-top:4px;">temps de perçage cumulé</div></div>
+        </div>
+        <div class="result-card" style="text-align:center;">
+          <div style="font-size:12px;color:var(--ink-dim);">Temps total estimé</div>
+          <div style="font-family:var(--display);font-size:30px;color:var(--accent);margin-top:4px;">${fmtMin(calc.tempsTotalMin)}</div>
+        </div>
+        <div style="overflow-x:auto;margin-top:16px;">
+          <div id="dxf-viewer-laser" class="dxf-viewer" style="width:100%;max-width:600px;height:420px;border:1px solid var(--line);border-radius:var(--radius);">
+            ${buildDxfSvg(laserResult.entities, laserResult.bbox)}
+            <div class="dxf-viewer-controls">
+              <button data-zoom-in title="Zoomer">+</button>
+              <button data-zoom-out title="Dézoomer">−</button>
+              <button data-zoom-reset title="Réinitialiser">⤾</button>
+            </div>
+            <div class="dxf-viewer-hint">Molette / pincement = zoom · glisser = déplacer</div>
+          </div>
+        </div>
+      </div>
+    ` : `<div class="empty" style="padding:36px 24px;"><b>Aucun fichier chargé</b>Charge un DXF pour voir l'estimation du temps de découpe.</div>`}
+  `;
+
+  document.getElementById('laser-matiere').onchange = (e)=>{
+    laserParams.matiere = e.target.value;
+    const epaisseurs = Object.keys(LASER_PRESETS[laserParams.matiere]).map(Number);
+    if(!epaisseurs.includes(laserParams.epaisseur)) laserParams.epaisseur = epaisseurs[0];
+    laserParams.vitesse = LASER_PRESETS[laserParams.matiere][laserParams.epaisseur];
+    renderDecoupeLaser();
+  };
+  document.getElementById('laser-epaisseur').onchange = (e)=>{
+    laserParams.epaisseur = Number(e.target.value);
+    laserParams.vitesse = LASER_PRESETS[laserParams.matiere][laserParams.epaisseur];
+    renderDecoupeLaser();
+  };
+  document.getElementById('laser-vitesse').onchange = (e)=>{ laserParams.vitesse = parseFloat(e.target.value)||1; renderDecoupeLaser(); };
+  document.getElementById('laser-percage').onchange = (e)=>{ laserParams.tempsPercage = parseFloat(e.target.value)||0; renderDecoupeLaser(); };
+
+  if(laserResult){ attachDxfZoomPan('dxf-viewer-laser'); }
+
+  document.getElementById('laser-file').onchange = async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    try{
+      const text = await file.text();
+      laserResult = analyzeDxfForLaser(text);
+      laserFileName = file.name;
+      toast('Fichier DXF analysé');
+      renderDecoupeLaser();
+    }catch(err){
+      console.error(err);
+      toast('Impossible de lire ce fichier : ' + err.message);
+    }
+  };
+}
 
 function renderScanner(){
   const view = document.getElementById('view');
@@ -1170,7 +2139,7 @@ function handleScanCode(code){
           <table style="margin-bottom:12px">
             <thead><tr><th>Référence</th><th>Nuance</th><th>Palette</th><th>Dimensions</th><th>Qté</th></tr></thead>
             <tbody>
-              ${items.map(t=>`<tr><td class="ref">${escapeHtml(t.ref)}</td><td class="dim">${t.nuance ? escapeHtml(t.nuance) : '—'}</td><td class="dim">${t.palette ? escapeHtml(t.palette) : '—'}</td><td class="dim">${t.longueur}×${t.largeur}×${t.epaisseur}mm</td><td>${t.qte}</td></tr>`).join('')}
+              ${items.map(t=>`<tr><td class="ref">${escapeHtml(t.ref)}</td><td class="dim">${t.nuance ? escapeHtml(t.nuance) : '—'}</td><td class="dim">${t.palette ? 'N°'+escapeHtml(t.palette) : '—'}</td><td class="dim">${t.longueur}×${t.largeur}×${t.epaisseur}mm</td><td>${t.qte}</td></tr>`).join('')}
             </tbody>
           </table>
         `}
@@ -1279,6 +2248,7 @@ auth.onAuthStateChanged(user => {
   if(user){
     startApp(user);
   }else{
+    detachListeners();
     document.getElementById('ruler').style.display = 'none';
     document.getElementById('sidebar').style.display = 'none';
     document.getElementById('main-view').style.display = 'none';
@@ -1325,6 +2295,1093 @@ function showInstallBanner(kind){
 
 if(isIosDevice() && !isStandaloneApp()){
   showInstallBanner('ios');
+}
+
+/* ---------------------------------------------------------
+   EMBOUTISSAGE — PIÈCE
+   (reprend le classeur « calcul prix outillage & matériaux » :
+   feuille "pièce FERM INF PIED AVT" — mêmes données, mêmes formules)
+--------------------------------------------------------- */
+function defaultEmbPiece(){
+  return {
+    nom: '',
+    qteLancement: 5,
+    epaisseur: 1.5,
+    longueurFlanc: 1000,
+    largeurFlanc: 500,
+    nbDecoupes: 0,
+    diametreDecoupes: 5,
+    nbPli: 0,
+    nbSoudures: 0,
+    vitesseLaser: 2000,
+    vitesseDebit: 50,
+    hauteurCoupeDebit: 0,
+    tempsEmboutissageMin: 0,
+    tempsPliageMin: 0,
+    tempsMontageOutilMin: 0,
+    decoupesLaser5axes: 0,
+    tempsControleMin: 0,
+    coutAdmin: 30,
+    coutAccessoire: 0,
+    coutMatiere: 0,
+    coutEmballage: 5,
+    coutSousTraitance: 0,
+    coutDivers: 0,
+    margeAppliquee: 0.25,
+    pieceFileName: '',
+    dateCreation: null, dateModification: null
+  };
+}
+
+function computePiece(p){
+  const poidsPiece = (p.longueurFlanc * p.largeurFlanc) * p.epaisseur * (8/1000000);
+  const longueurCoupe = (p.longueurFlanc + p.largeurFlanc + (p.nbDecoupes/2*3.2*p.diametreDecoupes)) * 2;
+  const tempsDecoupeMin = p.vitesseLaser>0 ? longueurCoupe / p.vitesseLaser : 0;
+  const tempsDebitMin = 0.5 + (p.vitesseDebit>0 ? p.hauteurCoupeDebit / p.vitesseDebit : 0);
+
+  const tLaserH = longueurCoupe===0 ? 0 : (15 + tempsDecoupeMin*p.qteLancement)/60;
+  const tDebitH = p.hauteurCoupeDebit===0 ? 0 : (7 + tempsDebitMin*p.qteLancement)/60;
+  const tEmbH = p.nbPli===0 ? 0 : (15 + p.tempsEmboutissageMin*p.qteLancement)/60;
+  const tPliageH = (p.tempsPliageMin*p.qteLancement)/60;
+  const tMontageH = p.tempsMontageOutilMin===0 ? 0 : (7 + p.tempsMontageOutilMin*p.qteLancement)/60;
+  const tLaser5axH = p.decoupesLaser5axes===0 ? 0 : (30 + p.decoupesLaser5axes*p.qteLancement)/60;
+  const tCondH = p.tempsControleMin===0 ? 0 : (7 + p.tempsControleMin*p.qteLancement)/60;
+  const tempsTotalH = tLaserH+tDebitH+tEmbH+tPliageH+tMontageH+tLaser5axH+tCondH;
+
+  const coutLaser = tLaserH*115;
+  const coutDebit = tDebitH*65;
+  const coutEmbFab = tEmbH*90;
+  const coutPliage = tPliageH*90;
+  const coutRepriseMontage = tMontageH*65;
+  const coutLaser5Ax = tLaser5axH*150;
+  const coutCondition = tCondH*40;
+
+  const poidsLot = poidsPiece*p.qteLancement;
+  const coutLogistique = poidsLot < 30 ? 25 : (poidsLot < 100 ? poidsLot*0.5 : poidsLot*0.35);
+
+  const coutGlobal = (p.coutAdmin||0) + (p.coutAccessoire||0) + (p.coutMatiere||0) + coutLaser + coutDebit + coutEmbFab + coutPliage
+    + coutRepriseMontage + coutLaser5Ax + coutCondition + (p.coutEmballage||0) + (p.coutSousTraitance||0) + coutLogistique + (p.coutDivers||0);
+  const coutPieceUnit = p.qteLancement>0 ? coutGlobal/p.qteLancement : 0;
+  const prixVente = coutPieceUnit + coutPieceUnit*(p.margeAppliquee||0);
+  const prixVenteGlobal = prixVente*p.qteLancement;
+
+  return { poidsPiece, longueurCoupe, tempsDecoupeMin, tempsDebitMin,
+    tLaserH, tDebitH, tEmbH, tPliageH, tMontageH, tLaser5axH, tCondH, tempsTotalH,
+    coutLaser, coutDebit, coutEmbFab, coutPliage, coutRepriseMontage, coutLaser5Ax, coutCondition, coutLogistique,
+    coutGlobal, coutPieceUnit, prixVente, prixVenteGlobal };
+}
+
+/* Tableau matière — référence (feuille "tableau matière" du classeur) */
+const MATIERE_TABLE = [
+  { nom:'ACIER', utilisation:'—', re:'—', rm:'—', allongement:'—', prixKg:'—', vda:'CR1220Y1500T-MS-ZV45/45-U', european:'-', renault:'XE1200MS + ZV', arcelor:'MS1500 + Jetgal®' },
+  { nom:'XC / DC01 EN', utilisation:'—', re:'140-300', rm:'270-410', allongement:26, prixKg:'2000x1000x1 36€\n2000x1000x1,5 44€\n2000x1000x2 52€\n2000x1000x3 58€', vda:'CR210BH-G40/40-U ou G60/60-U', european:'HX220BD + Z', renault:'GXE220BH', arcelor:'AM220BH + Z' },
+  { nom:'DC02 AM', utilisation:'—', re:'170-300', rm:'270-400', allongement:28, prixKg:'—', vda:'CR270BH-G60/60-U', european:'HX300BD + Z', renault:'-', arcelor:'AM300BH +Z' },
+  { nom:'XE / DC03 EN', utilisation:'—', re:'140-260', rm:'270-370', allongement:35, prixKg:'—', vda:'CR270LA (Sens Long)', european:'HC300LA (sens Travers)', renault:'XE280D (sens Long)', arcelor:'AM HSLA300 (sens Travers)' },
+  { nom:'XES / DC04 AM', utilisation:'—', re:'140-230', rm:'270-350', allongement:36, prixKg:'2000x1000x2,5 70€', vda:'CR300LA-G60/60-U', european:'-', renault:'HX300LAD', arcelor:'-' },
+  { nom:'SES / DC05 EN', utilisation:'—', re:'140-200', rm:'270-330', allongement:38, prixKg:'—', vda:'CR270LA-G40/40-U ou G60/60 U (sens long)', european:'HX300LAD + Z (sens Travers)', renault:'GXE280D (sens long)', arcelor:'AM HSLA300 + Z (sens Travers)' },
+  { nom:'DC06 EN', utilisation:'—', re:'120-190', rm:'270-330', allongement:39, prixKg:'—', vda:'CR380LA-G40/40-U ou 60/60-U', european:'HX380LAD + Z', renault:'GXE360D', arcelor:'AM-HSLA380-CR +Z' },
+  { nom:'DC07 EN', utilisation:'—', re:'100-150', rm:'250-310', allongement:42, prixKg:'—', vda:'CR420LA-G40/40-U', european:'HX420LAD+Z', renault:'-', arcelor:'AM-HSLA420 +Z' },
+  { nom:'DP600', utilisation:'acier de roulage à froid', re:370, rm:635, allongement:25, prixKg:'—', vda:'CR460LA-G40/40-U', european:'HX460LAD +Z', renault:'-', arcelor:'AM-HSLA420 +Z' },
+  { nom:'DP690', utilisation:'—', re:600, rm:760, allongement:17, prixKg:'—', vda:'CR590Y980T-DP-G40/40-U', european:'HCT980X', renault:'GXE590B', arcelor:'AM-DP980' },
+  { nom:'DP780', utilisation:'—', re:480, rm:830, allongement:14, prixKg:'—', vda:'HR2-G40/40-U', european:'-', renault:'GHC', arcelor:'AM-13 +Z' },
+  { nom:'DP980', utilisation:'—', re:650, rm:1000, allongement:11, prixKg:'—', vda:'HR2-UC-U', european:'-', renault:'HC', arcelor:'AM-13' },
+  { nom:'DP1180', utilisation:'—', re:940, rm:1250, allongement:7, prixKg:'—', vda:'HR300LA-G40/40-U ou G60/60-U', european:'HX340LAD +Z', renault:'GHE320D', arcelor:'AM-HSLA320- HR + Z' },
+  { nom:'DX51D', utilisation:'acier doux formage à froid avec galva', re:'—', rm:'270-500', allongement:22, prixKg:'—', vda:'HR300LA-UC-U', european:'-', renault:'HE320D', arcelor:'AM-HSLA320-HR' },
+  { nom:'DX52D', utilisation:'—', re:'140-300', rm:'270-420', allongement:26, prixKg:'—', vda:'HR340LA-G40/40-U ou G60/60-U', european:'HX380LAD+Z', renault:'GHE360D', arcelor:'AM-HLSA360-HR +Z' },
+  { nom:'DX53D', utilisation:'—', re:'140-260', rm:'270-380', allongement:30, prixKg:'—', vda:'HR380LA-G40/40-U ou G60/60-U', european:'HX380LAD+Z', renault:'-', arcelor:'AM-HSLA380-HR +Z' },
+  { nom:'DX54D', utilisation:'—', re:'120-220', rm:'260-350', allongement:36, prixKg:'—', vda:'HR440Y580T-FB-G60/60-U', european:'HDT560F+Z', renault:'GHE450M', arcelor:'AM-FB560 + Z' },
+  { nom:'DX56D', utilisation:'—', re:'120-180', rm:'260-350', allongement:39, prixKg:'—', vda:'HR660Y780T-CP-G60/60-U', european:'HDT780C+Z', renault:'GHE660M', arcelor:'AM-CP800SF-HR' },
+  { nom:'E36', utilisation:'—', re:355, rm:'450-600', allongement:22, prixKg:'~3', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'E275D', utilisation:'—', re:300, rm:440, allongement:21, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'E335D / S315MC', utilisation:'—', re:315, rm:'390-510', allongement:20, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'E390D / S355MC', utilisation:'—', re:355, rm:'510-680', allongement:19, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'HC260 LA', utilisation:'haute elasticité formage à froid', re:'260-330', rm:'350-430', allongement:26, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'HC300 LA', utilisation:'—', re:'300-380', rm:'380-480', allongement:23, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'HC340 LA', utilisation:'—', re:'340-420', rm:'410-510', allongement:21, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'HC380 LA', utilisation:'—', re:'380-480', rm:'440-560', allongement:19, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'HC420 LA', utilisation:'—', re:'420-520', rm:'470-590', allongement:17, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'HX220LAD', utilisation:'haute elasticité avec galva', re:'220-320', rm:'340-400', allongement:30, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'HX260LAD', utilisation:'—', re:'260-330', rm:'350-430', allongement:26, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'HX300LAD', utilisation:'—', re:'300-380', rm:'380-480', allongement:23, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'HX340LAD', utilisation:'—', re:'340-420', rm:'410-510', allongement:21, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'HX380LAD', utilisation:'—', re:'380-480', rm:'440-560', allongement:19, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'HX420LAD', utilisation:'—', re:'420-520', rm:'470-590', allongement:17, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'HX460LAD', utilisation:'—', re:'460-560', rm:'500-640', allongement:15, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'HX500LAD', utilisation:'—', re:'500-620', rm:'530-690', allongement:13, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'S460MC', utilisation:'—', re:460, rm:'520-670', allongement:15, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'3C / DD13', utilisation:'—', re:'200-310', rm:'300-400', allongement:29, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'40CMD8', utilisation:'matrice/poinçon', re:1010, rm:850, allongement:11, prixKg:'~3', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'304L (1.4307)', utilisation:'—', re:'175-220', rm:'450-700', allongement:40, prixKg:'1000x2000x1 430€\n1000x2000x2 250€\n1000x2000x3 375€', vda:'-', european:'-', renault:'-', arcelor:'-' },
+  { nom:'HR660Y760T', utilisation:'—', re:'660-820', rm:'760-960', allongement:10, prixKg:'—', vda:'-', european:'-', renault:'-', arcelor:'-' },
+];
+
+let embPieceEditing = null;
+let embPieceWireframe = null; // polylignes 3D du flanc chargé (fil de fer), non persisté
+
+function renderEmbPiece(){
+  const view = document.getElementById('view');
+  if(embPieceEditing){ renderEmbPieceForm(); return; }
+  view.innerHTML = `
+    <header class="page">
+      <div>
+        <div class="eyebrow">Emboutissage</div>
+        <h1>Pièce</h1>
+        <div class="lede">Chiffrage détaillé d'une pièce embouttie : temps de production et coût de revient, pièce par pièce.</div>
+      </div>
+      <button class="btn primary" id="emb-piece-new">+ Nouvelle pièce</button>
+    </header>
+
+    ${embPieces.length ? `
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Désignation</th><th>Qté lancement</th><th>Poids pièce</th><th>Coût pièce</th><th>Prix de vente</th><th>Prix vente lot</th><th>Modifié le</th><th></th></tr></thead>
+          <tbody>
+            ${embPieces.map(p=>{
+              const c = computePiece(p);
+              return `
+              <tr>
+                <td><b>${escapeHtml(p.nom||'(sans nom)')}</b></td>
+                <td>${p.qteLancement}</td>
+                <td>${c.poidsPiece.toFixed(2)} kg</td>
+                <td>${c.coutPieceUnit.toFixed(2)} €</td>
+                <td>${c.prixVente.toFixed(2)} €</td>
+                <td>${c.prixVenteGlobal.toFixed(2)} €</td>
+                <td>${formatDate(p.dateModification)}</td>
+                <td class="row-actions">
+                  <button class="btn small" data-emb-edit="${p.id}">Modifier</button>
+                  <button class="btn small danger" data-emb-del="${p.id}">Suppr.</button>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    ` : `<div class="empty" style="padding:36px 24px;"><b>Aucune pièce enregistrée</b>Clique sur « Nouvelle pièce » pour créer un premier chiffrage.</div>`}
+
+    <details style="margin-top:28px;">
+      <summary style="cursor:pointer;font-family:var(--display);font-size:14px;letter-spacing:.3px;color:var(--ink-dim);">Tableau des matières (référence)</summary>
+      <div class="table-wrap" style="margin-top:12px;">
+        <table style="min-width:900px;">
+          <thead><tr><th>Matière</th><th>Utilisation</th><th>Re (MPa)</th><th>Rm (MPa)</th><th>A (%)</th><th>Prix / kg ou tôle</th><th>VDA-SAE</th><th>European</th><th>Renault</th><th>ArcelorMittal</th></tr></thead>
+          <tbody>
+            ${MATIERE_TABLE.map(m=>`<tr>
+              <td>${escapeHtml(m.nom)}</td><td>${escapeHtml(String(m.utilisation||'—'))}</td><td>${escapeHtml(String(m.re||'—'))}</td><td>${escapeHtml(String(m.rm||'—'))}</td><td>${m.allongement??'—'}</td>
+              <td style="white-space:pre-line;">${escapeHtml(String(m.prixKg||'—'))}</td><td>${escapeHtml(m.vda||'—')}</td><td>${escapeHtml(m.european||'—')}</td><td>${escapeHtml(m.renault||'—')}</td><td>${escapeHtml(m.arcelor||'—')}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </details>
+  `;
+
+  document.getElementById('emb-piece-new').onclick = ()=>{
+    embPieceEditing = Object.assign(defaultEmbPiece(), { id: uid() });
+    embPieceWireframe = null;
+    render();
+  };
+  embPieces.forEach(p=>{
+    const editBtn = document.querySelector(`[data-emb-edit="${p.id}"]`);
+    if(editBtn) editBtn.onclick = ()=>{ embPieceEditing = JSON.parse(JSON.stringify(p)); embPieceWireframe = null; render(); };
+    const delBtn = document.querySelector(`[data-emb-del="${p.id}"]`);
+    if(delBtn) delBtn.onclick = async ()=>{
+      if(!confirm(`Supprimer la pièce « ${p.nom||'(sans nom)'} » ?`)) return;
+      embPieces = embPieces.filter(x=>x.id!==p.id);
+      await saveEmbPieces();
+      toast('Pièce supprimée');
+      render();
+    };
+  });
+}
+
+function renderEmbPieceForm(){
+  const view = document.getElementById('view');
+  const p = embPieceEditing;
+  const c = computePiece(p);
+  const field = (label, key, opts={}) => `
+    <div class="field">
+      <label>${label}</label>
+      <input type="number" step="${opts.step||1}" data-field="${key}" value="${p[key]}" ${opts.min!=null?`min="${opts.min}"`:''}>
+    </div>`;
+
+  view.innerHTML = `
+    <header class="page">
+      <div>
+        <div class="eyebrow">Emboutissage · Pièce</div>
+        <h1>${p._fbId ? 'Modifier la pièce' : 'Nouvelle pièce'}</h1>
+        <div class="lede">Renseigne les données techniques de la pièce ; le temps de production et le coût de revient se calculent automatiquement.</div>
+      </div>
+    </header>
+
+    <div class="modal" style="max-width:720px;margin:0 0 24px;box-shadow:none;">
+      <div class="field"><label>Désignation de la pièce</label><input type="text" id="ep-nom" value="${escapeHtml(p.nom)}" placeholder="Ex. FERM INF PIED AVT"></div>
+
+      <div class="field">
+        <label>Charger le flanc à plat depuis un fichier STEP</label>
+        <input type="file" id="ep-step-file" accept=".step,.stp">
+        ${p.pieceFileName ? `<span class="hint" style="font-size:11px;color:var(--ink-dim);display:block;margin-top:4px;">Fichier chargé : ${escapeHtml(p.pieceFileName)}</span>` : ''}
+        <span class="hint" style="font-size:11px;color:var(--ink-dim);display:block;margin-top:4px;">Lecture approximative (boîte englobante à partir des points 3D du flanc développé) — longueur/largeur/épaisseur sont pré-remplies ci-dessous, vérifie-les et corrige-les si besoin.</span>
+      </div>
+
+      ${embPieceWireframe ? `
+        <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:18px 0 10px;color:var(--ink-dim);">Visualisation du flanc</h3>
+        <div style="overflow-x:auto;margin-bottom:8px;">
+          <div id="step-viewer-piece" class="dxf-viewer" style="width:100%;max-width:700px;height:420px;border:1px solid var(--line);border-radius:var(--radius);">
+            ${buildStepWireframeSvg(embPieceWireframe)}
+            <div class="dxf-viewer-controls">
+              <button data-zoom-in title="Zoomer">+</button>
+              <button data-zoom-out title="Dézoomer">−</button>
+              <button data-zoom-reset title="Réinitialiser">⤾</button>
+            </div>
+            <div class="dxf-viewer-hint">Molette / pincement = zoom · glisser = déplacer</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--ink-dim);margin:0 0 18px;">Visualisation filaire approximative reconstruite depuis le fichier STEP — pas un rendu solide, à vérifier.</div>
+      ` : ''}
+
+      <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:18px 0 10px;color:var(--ink-dim);">Données pièce</h3>
+      <div class="grid3">
+        ${field('Qté de lancement','qteLancement',{min:1})}
+        ${field('Épaisseur (mm)','epaisseur',{step:0.1,min:0})}
+        ${field('Nb de pli','nbPli',{min:0})}
+      </div>
+      <div class="grid3">
+        ${field('Longueur flanc (mm)','longueurFlanc',{min:0})}
+        ${field('Largeur flanc (mm)','largeurFlanc',{min:0})}
+        ${field('Nb de soudure par points','nbSoudures',{min:0})}
+      </div>
+      <div class="grid3">
+        ${field('Nb de découpes','nbDecoupes',{min:0})}
+        ${field('Ø moyen des découpes (mm)','diametreDecoupes',{step:0.1,min:0})}
+      </div>
+
+      <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:18px 0 10px;color:var(--ink-dim);">Laser &amp; débit</h3>
+      <div class="grid3">
+        ${field('Vitesse de découpe laser (mm/min)','vitesseLaser',{min:1})}
+        ${field('Vitesse de découpe débit (mm/min)','vitesseDebit',{min:1})}
+        ${field('Hauteur de coupe débit (mm)','hauteurCoupeDebit',{min:0})}
+      </div>
+
+      <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:18px 0 10px;color:var(--ink-dim);">Emboutissage, pliage, montage</h3>
+      <div class="grid3">
+        ${field('Emboutissage (min)','tempsEmboutissageMin',{step:0.1,min:0})}
+        ${field('Pliage (min)','tempsPliageMin',{step:0.1,min:0})}
+        ${field('Montage outil (min)','tempsMontageOutilMin',{step:0.1,min:0})}
+      </div>
+      <div class="grid3">
+        ${field('Découpes laser 5 axes (nb)','decoupesLaser5axes',{min:0})}
+        ${field('Contrôle (min)','tempsControleMin',{step:0.01,min:0})}
+      </div>
+
+      <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:18px 0 10px;color:var(--ink-dim);">Coûts &amp; marge</h3>
+      <div class="grid3">
+        ${field('Administratif / chiffrage (€)','coutAdmin',{min:0})}
+        ${field('Accessoire / quincaillerie (€)','coutAccessoire',{min:0})}
+        ${field('Matière (€) — Acier 3€ / Alu 5€ / Inox 6€ le kg','coutMatiere',{step:0.01,min:0})}
+      </div>
+      <div class="grid3">
+        ${field('Emballage (€)','coutEmballage',{min:0})}
+        ${field('Sous-traitance (€)','coutSousTraitance',{min:0})}
+        ${field('Divers (majoration/minoration) (€)','coutDivers',{min:0})}
+      </div>
+      <div class="field" style="max-width:260px;"><label>Marge appliquée</label><input type="number" step="0.01" id="ep-marge" value="${p.margeAppliquee}"></div>
+    </div>
+
+    <div class="modal" style="max-width:720px;margin:0 0 24px;box-shadow:none;">
+      <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:0 0 12px;color:var(--ink-dim);">Production — temps alloué</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Opération</th><th>Temps alloué</th></tr></thead>
+          <tbody>
+            <tr><td>Laser</td><td>${c.tLaserH.toFixed(3)} h</td></tr>
+            <tr><td>Débit</td><td>${c.tDebitH.toFixed(3)} h</td></tr>
+            <tr><td>Emboutissage</td><td>${c.tEmbH.toFixed(3)} h</td></tr>
+            <tr><td>Pliage</td><td>${c.tPliageH.toFixed(3)} h</td></tr>
+            <tr><td>Reprise / montage</td><td>${c.tMontageH.toFixed(3)} h</td></tr>
+            <tr><td>Laser 5 axes</td><td>${c.tLaser5axH.toFixed(3)} h</td></tr>
+            <tr><td>Conditionnement</td><td>${c.tCondH.toFixed(3)} h</td></tr>
+            <tr style="font-weight:600;"><td>Total</td><td>${c.tempsTotalH.toFixed(3)} h</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:18px 0 12px;color:var(--ink-dim);">Coûts</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Poste</th><th>Coût global (lot)</th></tr></thead>
+          <tbody>
+            <tr><td>Administratif / chiffrage</td><td>${p.coutAdmin.toFixed(2)} €</td></tr>
+            <tr><td>Accessoire / quincaillerie</td><td>${p.coutAccessoire.toFixed(2)} €</td></tr>
+            <tr><td>Matière</td><td>${p.coutMatiere.toFixed(2)} €</td></tr>
+            <tr><td>Laser (150€/h)</td><td>${c.coutLaser.toFixed(2)} €</td></tr>
+            <tr><td>Débit</td><td>${c.coutDebit.toFixed(2)} €</td></tr>
+            <tr><td>Emboutissage</td><td>${c.coutEmbFab.toFixed(2)} €</td></tr>
+            <tr><td>Pliage</td><td>${c.coutPliage.toFixed(2)} €</td></tr>
+            <tr><td>Reprise / montage</td><td>${c.coutRepriseMontage.toFixed(2)} €</td></tr>
+            <tr><td>Laser 5 axes</td><td>${c.coutLaser5Ax.toFixed(2)} €</td></tr>
+            <tr><td>Conditionnement</td><td>${c.coutCondition.toFixed(2)} €</td></tr>
+            <tr><td>Emballage</td><td>${p.coutEmballage.toFixed(2)} €</td></tr>
+            <tr><td>Sous-traitance</td><td>${p.coutSousTraitance.toFixed(2)} €</td></tr>
+            <tr><td>Logistique</td><td>${c.coutLogistique.toFixed(2)} €</td></tr>
+            <tr><td>Divers</td><td>${p.coutDivers.toFixed(2)} €</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid3" style="margin-top:16px;">
+        <div class="result-card"><div style="font-family:var(--display);font-size:20px;">${c.poidsPiece.toFixed(2)} kg</div><div style="font-size:12px;color:var(--ink-dim);margin-top:4px;">poids pièce</div></div>
+        <div class="result-card"><div style="font-family:var(--display);font-size:20px;">${c.coutGlobal.toFixed(2)} €</div><div style="font-size:12px;color:var(--ink-dim);margin-top:4px;">coût global (lot de ${p.qteLancement})</div></div>
+        <div class="result-card"><div style="font-family:var(--display);font-size:20px;">${c.coutPieceUnit.toFixed(2)} €</div><div style="font-size:12px;color:var(--ink-dim);margin-top:4px;">coût / pièce</div></div>
+      </div>
+      <div class="result-card" style="text-align:center;margin-top:16px;">
+        <div style="font-size:12px;color:var(--ink-dim);">Prix de vente / pièce (marge ${(p.margeAppliquee*100).toFixed(0)}%)</div>
+        <div style="font-family:var(--display);font-size:28px;color:var(--accent);margin-top:4px;">${c.prixVente.toFixed(2)} €</div>
+        <div style="font-size:12px;color:var(--ink-dim);margin-top:10px;">Prix de vente global du lot : <b style="color:var(--ink);">${c.prixVenteGlobal.toFixed(2)} €</b></div>
+      </div>
+
+      <div class="modal-actions" style="justify-content:flex-start;">
+        <button class="btn primary" id="ep-save">Enregistrer la pièce</button>
+        <button class="btn" id="ep-cancel">Annuler</button>
+      </div>
+    </div>
+  `;
+
+  document.querySelectorAll('[data-field]').forEach(inp=>{
+    inp.onchange = (e)=>{
+      const key = e.target.dataset.field;
+      p[key] = parseFloat(e.target.value) || 0;
+      renderEmbPieceForm();
+    };
+  });
+  document.getElementById('ep-nom').onchange = (e)=>{ p.nom = e.target.value; };
+  document.getElementById('ep-marge').onchange = (e)=>{ p.margeAppliquee = parseFloat(e.target.value)||0; renderEmbPieceForm(); };
+
+  document.getElementById('ep-step-file').onchange = async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    try{
+      const text = await file.text();
+      const bbox = parseStepBoundingBox3D(text);
+      p.longueurFlanc = bbox.longueur; p.largeurFlanc = bbox.largeur;
+      if(bbox.hauteur>0) p.epaisseur = bbox.hauteur;
+      p.pieceFileName = file.name;
+      if(!p.nom || !p.nom.trim()) p.nom = file.name.replace(/\.(stp|step)$/i, '');
+      try{ embPieceWireframe = parseStepWireframe(text); }catch(werr){ console.error(werr); embPieceWireframe = null; }
+      toast(`Flanc lu : ${bbox.longueur} × ${bbox.largeur} × ${bbox.hauteur} mm`);
+      renderEmbPieceForm();
+    }catch(err){
+      console.error(err);
+      toast('Impossible de lire ce fichier : ' + err.message);
+    }
+  };
+
+  document.getElementById('ep-save').onclick = async ()=>{
+    if(!p.nom || !p.nom.trim()){ toast('Indique une désignation pour la pièce'); return; }
+    if(!p.dateCreation) p.dateCreation = new Date().toISOString();
+    const idx = embPieces.findIndex(x=>x.id===p.id);
+    if(idx>=0) embPieces[idx] = p; else embPieces.push(p);
+    await saveEmbPieces();
+    toast('Pièce enregistrée');
+    embPieceEditing = null;
+    embPieceWireframe = null;
+    render();
+  };
+  document.getElementById('ep-cancel').onclick = ()=>{ embPieceEditing = null; embPieceWireframe = null; render(); };
+
+  if(embPieceWireframe){ attachDxfZoomPan('step-viewer-piece'); }
+}
+
+/* ---------------------------------------------------------
+   EMBOUTISSAGE — OUTILLAGE
+   (reprend la feuille "outil FERM INF PIED AVT" + l'abaque d'usinage)
+--------------------------------------------------------- */
+function defaultEmbOutil(){
+  return {
+    nom: '',
+    pieceLongueur: 0, pieceLargeur: 0, pieceHauteur: 0,
+    pieceFileName: '',
+    hasSerreFlan: true,
+    symetrique: false,
+    symetrieAxe: 'X',
+    prixKgMatiere: 4,
+    prixUsinageM3: null, // null = suit le prix moyen /m³ de l'abaque d'usinage, modifiable
+    matriceLOverride: null, matriceWOverride: null, matriceHOverride: null, // null = valeur calculée automatiquement, modifiable ensuite à la main
+    poinconLOverride: null, poinconWOverride: null, poinconHOverride: null,
+    moRows: [
+      { key:'programmation', label:'Programmation', enabled:true, hg:1, chg:60, hd:1, chd:60 },
+      { key:'cao', label:'CAO', enabled:true, hg:8, chg:75, hd:8, chd:75 },
+      { key:'map', label:'MAP', enabled:true, hg:6, chg:75, hd:6, chd:75 },
+      { key:'usinage', label:'Usinage', enabled:true, hg:null, chg:120, hd:null, chd:120 }, // hg/hd null = suivent automatiquement l'abaque usinage (bloc matrice) jusqu'à saisie manuelle
+      { key:'laser5axprog', label:'Programme laser 5 axes', enabled:true, hg:2, chg:85, hd:2, chd:85 },
+      { key:'laser5axmaquette', label:'Maquette laser 5 axes', enabled:true, hg:2, chg:85, hd:2, chd:85 },
+    ],
+    dateCreation: null, dateModification: null
+  };
+}
+
+/* Densité de l'acier (kg/m³), utilisée pour chiffrer le poids — donc le coût matière —
+   de la matrice, du poinçon et du serre-flan à partir de leur seul volume. */
+const DENSITE_ACIER_KG_M3 = 7850;
+
+/* Cherche dans l'abaque d'usinage le bloc dont le volume est le plus proche de celui demandé
+   (longueur/largeur/hauteur en mm) — sert uniquement à estimer le temps d'usinage (ligne
+   "Usinage" de la main d'oeuvre), le coût matière étant calculé par poids × prix/kg. */
+function findAbaqueMatch(l, w, h){
+  if(!l || !w || !h) return null;
+  const vol = l*w*h*1e-9;
+  let best = null, bestDiff = Infinity;
+  ABAQUE_USINAGE.forEach(a=>{
+    const v = a.l*a.w*a.h*1e-9;
+    const diff = Math.abs(v-vol);
+    if(diff < bestDiff){ bestDiff = diff; best = a; }
+  });
+  if(!best) return null;
+  return { ref: best, volumeDemande: vol, prixUsinage: best.prixUsinage, prixMatiere: best.prixMatiere, nbHeureUsinage: best.prixUsinage/85 };
+}
+
+/* Lecture approximative d'un fichier STEP : boîte englobante 3D à partir des sommets réels de la
+   pièce (VERTEX_POINT). Comme pour l'imbrication, c'est une approximation (pas de vraie géométrie
+   CAO) — à vérifier. On exclut volontairement les CARTESIAN_POINT qui ne sont pas des sommets
+   (origines de repères, points de construction des courbes) : les inclure fait exploser la boîte
+   englobante, en général jusqu'à l'origine (0,0,0) du repère global de l'assemblage. */
+function parseStepBoundingBox3D(text){
+  const pts = stepCartesianPoints(text);
+  const vertexRe = /VERTEX_POINT\s*\(\s*'[^']*'\s*,\s*#(\d+)\s*\)/g;
+  let m, minX=Infinity, minY=Infinity, minZ=Infinity, maxX=-Infinity, maxY=-Infinity, maxZ=-Infinity, found=0;
+  while((m = vertexRe.exec(text))){
+    const v = pts[m[1]];
+    if(!v || v.length<3) continue;
+    found++;
+    if(v[0]<minX)minX=v[0]; if(v[0]>maxX)maxX=v[0];
+    if(v[1]<minY)minY=v[1]; if(v[1]>maxY)maxY=v[1];
+    if(v[2]<minZ)minZ=v[2]; if(v[2]>maxZ)maxZ=v[2];
+  }
+  if(!found){
+    Object.values(pts).forEach(v=>{
+      if(v.length<3) return;
+      if(v[0]<minX)minX=v[0]; if(v[0]>maxX)maxX=v[0];
+      if(v[1]<minY)minY=v[1]; if(v[1]>maxY)maxY=v[1];
+      if(v[2]<minZ)minZ=v[2]; if(v[2]>maxZ)maxZ=v[2];
+    });
+  }
+  if(!isFinite(minX)) throw new Error('Aucun point exploitable trouvé dans le fichier STEP.');
+  const longueur = Math.round(maxX-minX), largeur = Math.round(maxY-minY), hauteur = Math.round(maxZ-minZ);
+  return { longueur, largeur, hauteur, volume: (longueur*largeur*hauteur)/1e9 };
+}
+
+/* ---------------------------------------------------------
+   VISUALISATION APPROXIMATIVE D'UN FICHIER STEP (fil de fer)
+   On reconstruit chaque arête de la pièce (EDGE_CURVE) :
+   - les arêtes portées par une B-spline (B_SPLINE_CURVE_WITH_KNOTS, non rationnelle) sont
+     échantillonnées par l'algorithme de De Boor pour suivre la vraie courbe ;
+   - les autres (LINE, CIRCLE...) sont tracées en corde droite entre les deux sommets de l'arête.
+   C'est une approximation filaire (pas un rendu solide), suffisante pour vérifier la forme
+   générale de la pièce avant usinage de l'outil.
+--------------------------------------------------------- */
+function parseStepWireframe(text){
+  const pts = stepCartesianPoints(text);
+
+  const vertexPt = {};
+  const vertexRe = /#(\d+)\s*=\s*VERTEX_POINT\s*\(\s*'[^']*'\s*,\s*#(\d+)\s*\)/g;
+  let m;
+  while((m = vertexRe.exec(text))){ const p = pts[m[2]]; if(p) vertexPt[m[1]] = p; }
+
+  const bsplines = {};
+  const bsRe = /#(\d+)\s*=\s*B_SPLINE_CURVE_WITH_KNOTS\s*\(\s*'[^']*'\s*,\s*(\d+)\s*,\s*\(([^)]+)\)\s*,[^,]+,[^,]+,[^,]+,\s*\(([^)]+)\)\s*,\s*\(([^)]+)\)/g;
+  while((m = bsRe.exec(text))){
+    bsplines[m[1]] = {
+      degree: parseInt(m[2], 10),
+      cpIds: m[3].split(',').map(s=>s.trim().replace('#','')),
+      knotMult: m[4].split(',').map(s=>parseInt(s.trim(),10)),
+      knotVals: m[5].split(',').map(s=>parseFloat(s.trim()))
+    };
+  }
+
+  const edges = [];
+  const edgeRe = /#(\d+)\s*=\s*EDGE_CURVE\s*\(\s*'[^']*'\s*,\s*#(\d+)\s*,\s*#(\d+)\s*,\s*#(\d+)\s*,\s*\.[TF]\.\s*\)/g;
+  while((m = edgeRe.exec(text))){ edges.push({ v1:m[2], v2:m[3], curve:m[4] }); }
+
+  function expandKnots(mult, vals){
+    const out = [];
+    for(let i=0;i<mult.length;i++) for(let j=0;j<mult[i];j++) out.push(vals[i]);
+    return out;
+  }
+  // Algorithme de De Boor : évalue un point sur une B-spline (non rationnelle) de degré p,
+  // vecteur de noeuds U, points de contrôle Pw, au paramètre u.
+  function deBoor(p, U, Pw, u){
+    const n = Pw.length - 1;
+    let k = p;
+    while(k < n && u >= U[k+1]) k++;
+    if(u >= U[U.length-1-p]) k = n;
+    const d = [];
+    for(let i=0;i<=p;i++) d[i] = Pw[k-p+i].slice();
+    for(let r=1;r<=p;r++){
+      for(let i=p;i>=r;i--){
+        const denom = U[k+1+i-r] - U[k+i-p];
+        const alpha = denom!==0 ? (u - U[k+i-p])/denom : 0;
+        d[i] = [0,1,2].map(ax => (1-alpha)*d[i-1][ax] + alpha*d[i][ax]);
+      }
+    }
+    return d[p];
+  }
+
+  const polylines = [];
+  edges.forEach(e=>{
+    const p1 = vertexPt[e.v1], p2 = vertexPt[e.v2];
+    if(!p1 || !p2) return;
+    const bs = bsplines[e.curve];
+    if(bs){
+      const cps = bs.cpIds.map(id=>pts[id]);
+      if(cps.every(Boolean) && cps.length > bs.degree){
+        const U = expandKnots(bs.knotMult, bs.knotVals);
+        const uStart = U[bs.degree], uEnd = U[U.length-1-bs.degree];
+        const N = 10;
+        const line = [];
+        for(let i=0;i<=N;i++){
+          const u = (i===N) ? uEnd - 1e-9 : uStart + (uEnd-uStart)*(i/N);
+          line.push(deBoor(bs.degree, U, cps, u));
+        }
+        polylines.push(line);
+        return;
+      }
+    }
+    polylines.push([p1, p2]);
+  });
+  return polylines;
+}
+
+/* Construit le SVG du viewer (projection 2D sur les deux axes de plus grande étendue).
+   mirrorPolylines, si fourni, est tracé en plus (en rouge) — utilisé pour prévisualiser
+   la pièce et son symétrique côte à côte. */
+function buildStepWireframeSvg(polylines, mirrorPolylines){
+  const allPts = [];
+  polylines.forEach(line=>line.forEach(p=>allPts.push(p)));
+  if(mirrorPolylines) mirrorPolylines.forEach(line=>line.forEach(p=>allPts.push(p)));
+  if(!allPts.length) return '<div class="empty" style="padding:24px;">Aucune géométrie exploitable dans ce fichier.</div>';
+
+  const ranges = [0,1,2].map(ax=>{
+    let mn=Infinity, mx=-Infinity;
+    allPts.forEach(p=>{ if(p[ax]<mn)mn=p[ax]; if(p[ax]>mx)mx=p[ax]; });
+    return { ax, mn, mx, span: mx-mn };
+  }).sort((a,b)=> b.span - a.span);
+  const uRange = ranges[0], vRange = ranges[1];
+
+  const w = Math.max(1, uRange.span), h = Math.max(1, vRange.span);
+  const pad = Math.max(w,h)*0.05;
+  const vbW = w+pad*2, vbH = h+pad*2;
+  const sx = p => (p[uRange.ax]-uRange.mn+pad).toFixed(2);
+  const sy = p => (vbH - (p[vRange.ax]-vRange.mn+pad)).toFixed(2);
+  const strokeW = (Math.max(w,h)*0.0025).toFixed(3);
+
+  function pathFor(lines, color){
+    return lines.map(line=>{
+      const d = line.map(p=>`${sx(p)},${sy(p)}`).join(' ');
+      return `<polyline points="${d}" fill="none" stroke="${color}" stroke-width="${strokeW}"/>`;
+    }).join('');
+  }
+
+  return `<svg width="100%" height="100%" viewBox="0 0 ${vbW} ${vbH}" preserveAspectRatio="xMidYMid meet" style="background:#fff;display:block;">
+    <g>${pathFor(polylines, '#1a1a1a')}</g>
+    ${mirrorPolylines ? `<g>${pathFor(mirrorPolylines, '#c1443c')}</g>` : ''}
+  </svg>`;
+}
+
+/* Calcule la pièce symétrique (miroir sur l'axe X=0 ou Y=1), accolée avec un espace de 50 mm,
+   pour une prévisualisation côte à côte — même logique que l'effet "symétrique" de l'outillage. */
+function mirrorStepWireframe(polylines, axisIndex, gap){
+  let mx = -Infinity;
+  polylines.forEach(line=>line.forEach(p=>{ if(p[axisIndex]>mx) mx=p[axisIndex]; }));
+  if(!isFinite(mx)) return polylines;
+  return polylines.map(line=>line.map(p=>{
+    const q = p.slice();
+    q[axisIndex] = 2*mx + gap - p[axisIndex];
+    return q;
+  }));
+}
+
+function computeOutil(o){
+  // Outillage symétrique : si l'outil produit la pièce et son symétrique en une seule frappe,
+  // on double la dimension pièce sur l'axe choisi (X ou Y) et on ajoute 50 mm (espace entre les deux moitiés)
+  // avant de dimensionner matrice / poinçon / serre-flan.
+  const isSym = o.symetrique === true;
+  const symAxe = o.symetrieAxe === 'Y' ? 'Y' : 'X';
+  const effLongueur = (isSym && symAxe==='X') ? (o.pieceLongueur*2 + 50) : o.pieceLongueur;
+  const effLargeur = (isSym && symAxe==='Y') ? (o.pieceLargeur*2 + 50) : o.pieceLargeur;
+
+  // Dimensions calculées automatiquement — modifiables ensuite à la main (override), sinon elles suivent la formule.
+  const matriceLCalc = effLongueur+160, matriceWCalc = effLargeur+160, matriceHCalc = o.pieceHauteur+50;
+  const poinconLCalc = effLongueur, poinconWCalc = effLargeur, poinconHCalc = Math.max(o.pieceHauteur+50, 100);
+  const matriceL = o.matriceLOverride!=null ? o.matriceLOverride : matriceLCalc;
+  const matriceW = o.matriceWOverride!=null ? o.matriceWOverride : matriceWCalc;
+  const matriceH = o.matriceHOverride!=null ? o.matriceHOverride : matriceHCalc;
+  const poinconL = o.poinconLOverride!=null ? o.poinconLOverride : poinconLCalc;
+  const poinconW = o.poinconWOverride!=null ? o.poinconWOverride : poinconWCalc;
+  const poinconH = o.poinconHOverride!=null ? o.poinconHOverride : poinconHCalc;
+  const hasSerreFlan = o.hasSerreFlan !== false;
+  const serreFlanL = hasSerreFlan ? matriceL : 0, serreFlanW = hasSerreFlan ? matriceW : 0, serreFlanH = hasSerreFlan ? 30 : 0;
+
+  // Coût matière = volume (m³) × densité acier (kg/m³) = poids (kg) × prix/kg (42CMD8, par défaut 4€).
+  const prixKg = o.prixKgMatiere != null ? o.prixKgMatiere : 4;
+  const matriceVolume = matriceL*matriceW*matriceH*1e-9;
+  const matricePoids = matriceVolume*DENSITE_ACIER_KG_M3;
+  const matriceCoutMatiere = matricePoids*prixKg;
+  const poinconVolume = poinconL*poinconW*poinconH*1e-9;
+  const poinconPoids = poinconVolume*DENSITE_ACIER_KG_M3;
+  const poinconCoutMatiere = poinconPoids*prixKg;
+  const serreFlanVolume = hasSerreFlan ? serreFlanL*serreFlanW*serreFlanH*1e-9 : 0;
+  const serreFlanPoids = serreFlanVolume*DENSITE_ACIER_KG_M3;
+  const serreFlanCoutMatiere = hasSerreFlan ? serreFlanPoids*prixKg : 0;
+
+  const matiereTotal = matriceCoutMatiere + poinconCoutMatiere + serreFlanCoutMatiere;
+
+  // Coût d'usinage de la matrice et du poinçon = leur volume (m³) × le prix moyen au m³ de
+  // l'abaque d'usinage (par défaut) — modifiable. Le temps (heures) qui en découle vient
+  // alimenter automatiquement la ligne "Usinage" de la main d'oeuvre, tant que l'utilisateur
+  // n'a pas saisi sa propre valeur.
+  const prixUsinageM3 = o.prixUsinageM3 != null ? o.prixUsinageM3 : abaqueMoyennePrixM3();
+  const matriceCoutUsinage = matriceVolume*prixUsinageM3;
+  const poinconCoutUsinage = poinconVolume*prixUsinageM3;
+  const usinageRowDef = (o.moRows||[]).find(r=>r.key==='usinage') || {};
+  const tarifUsinageG = usinageRowDef.chg || 120;
+  const tarifUsinageD = usinageRowDef.chd || 120;
+  const matriceHeuresUsinageG = tarifUsinageG>0 ? matriceCoutUsinage/tarifUsinageG : 0;
+  const poinconHeuresUsinageG = tarifUsinageG>0 ? poinconCoutUsinage/tarifUsinageG : 0;
+  const matriceHeuresUsinageD = tarifUsinageD>0 ? matriceCoutUsinage/tarifUsinageD : 0;
+  const poinconHeuresUsinageD = tarifUsinageD>0 ? poinconCoutUsinage/tarifUsinageD : 0;
+  const heuresUsinageAutoG = matriceHeuresUsinageG + poinconHeuresUsinageG;
+  const heuresUsinageAutoD = matriceHeuresUsinageD + poinconHeuresUsinageD;
+
+  const rows = (o.moRows||[]).map(r=>{
+    const on = r.enabled !== false;
+    let hg = r.hg, hd = r.hd;
+    if(r.key==='usinage' && (hg==null || hg==='')) hg = heuresUsinageAutoG;
+    if(r.key==='usinage' && (hd==null || hd==='')) hd = heuresUsinageAutoD;
+    hg = hg||0; hd = hd||0;
+    return Object.assign({}, r, { hg, hd, totG: on ? hg*(r.chg||0) : 0, totD: on ? hd*(r.chd||0) : 0 });
+  });
+  const sumG = rows.reduce((s,r)=>s+r.totG,0);
+  const sumD = rows.reduce((s,r)=>s+r.totD,0);
+  const totalMainG = sumG + matiereTotal;
+  const totalMainD = sumD + matiereTotal;
+  return { matriceL, matriceW, matriceH, poinconL, poinconW, poinconH, serreFlanL, serreFlanW, serreFlanH, hasSerreFlan,
+    matriceLCalc, matriceWCalc, matriceHCalc, poinconLCalc, poinconWCalc, poinconHCalc,
+    isSym, symAxe, effLongueur, effLargeur,
+    matriceVolume, matricePoids, matriceCoutMatiere,
+    poinconVolume, poinconPoids, poinconCoutMatiere,
+    serreFlanVolume, serreFlanPoids, serreFlanCoutMatiere,
+    prixKg, prixUsinageM3, matriceCoutUsinage, poinconCoutUsinage,
+    matriceHeuresUsinageG, poinconHeuresUsinageG, heuresUsinageAutoG, heuresUsinageAutoD,
+    matiereTotal, rows, sumG, sumD, totalMainG, totalMainD };
+}
+
+/* Abaque usinage outil — référence (feuille "abaque usinage outil" du classeur) */
+const ABAQUE_USINAGE = [
+  {l:270,w:180,h:30,prixMatiere:null,prixUsinage:1080,note:null},
+  {l:230,w:130,h:50,prixMatiere:null,prixUsinage:930,note:'FOND MOBILE'},
+  {l:240,w:75,h:100,prixMatiere:null,prixUsinage:630,note:null},
+  {l:240,w:160,h:60,prixMatiere:null,prixUsinage:780,note:null},
+  {l:457,w:174,h:30,prixMatiere:null,prixUsinage:1750,note:'SGD'},
+  {l:300,w:200,h:50,prixMatiere:null,prixUsinage:1200,note:'SGD'},
+  {l:220,w:150,h:100,prixMatiere:null,prixUsinage:1160,note:'SGD'},
+  {l:430,w:257,h:30,prixMatiere:null,prixUsinage:1140,note:null},
+  {l:340,w:190,h:70,prixMatiere:null,prixUsinage:1340,note:null},
+  {l:330,w:210,h:70,prixMatiere:null,prixUsinage:1030,note:null},
+  {l:290,w:220,h:90,prixMatiere:null,prixUsinage:2000,note:null},
+  {l:270,w:240,h:90,prixMatiere:null,prixUsinage:960,note:null},
+  {l:410,w:245,h:60,prixMatiere:null,prixUsinage:1770,note:null},
+  {l:370,w:340,h:50,prixMatiere:null,prixUsinage:1560,note:null},
+  {l:500,w:480,h:30,prixMatiere:null,prixUsinage:1460,note:null},
+  {l:320,w:230,h:100,prixMatiere:null,prixUsinage:2460,note:'SGD'},
+  {l:360,w:275,h:80,prixMatiere:null,prixUsinage:1620,note:null},
+  {l:310,w:210,h:130,prixMatiere:null,prixUsinage:1680,note:'FOND MOBILE'},
+  {l:480,w:300,h:90,prixMatiere:null,prixUsinage:2800,note:null},
+  {l:1000,w:480,h:30,prixMatiere:null,prixUsinage:1780,note:null},
+  {l:660,w:250,h:100,prixMatiere:null,prixUsinage:3460,note:'FOND MOBILE'},
+  {l:420,w:380,h:110,prixMatiere:null,prixUsinage:2090,note:null},
+  {l:400,w:400,h:110,prixMatiere:null,prixUsinage:1860,note:null},
+  {l:450,w:280,h:155,prixMatiere:386,prixUsinage:2500,note:null},
+  {l:700,w:400,h:85,prixMatiere:null,prixUsinage:2340,note:null},
+  {l:700,w:400,h:90,prixMatiere:430,prixUsinage:2340,note:null},
+  {l:650,w:390,h:100,prixMatiere:null,prixUsinage:3750,note:null},
+  {l:450,w:400,h:150,prixMatiere:null,prixUsinage:2360,note:null},
+  {l:880,w:410,h:80,prixMatiere:null,prixUsinage:5857,note:null},
+  {l:860,w:370,h:110,prixMatiere:null,prixUsinage:3480,note:null},
+  {l:500,w:420,h:170,prixMatiere:null,prixUsinage:3420,note:null},
+  {l:650,w:550,h:140,prixMatiere:927,prixUsinage:3500,note:null},
+  {l:820,w:640,h:110,prixMatiere:null,prixUsinage:5500,note:null},
+  {l:820,w:640,h:110,prixMatiere:null,prixUsinage:5480,note:null},
+  {l:900,w:800,h:170,prixMatiere:null,prixUsinage:3740,note:null},
+  {l:1040,w:400,h:330,prixMatiere:2400,prixUsinage:9400,note:null},
+  {l:800,w:700,h:280,prixMatiere:4700,prixUsinage:11200,note:null},
+  {l:800,w:500,h:270,prixMatiere:null,prixUsinage:6600,note:'FOYART'},
+  {l:800,w:500,h:300,prixMatiere:null,prixUsinage:10640,note:'FOYART'},
+  {l:800,w:500,h:270,prixMatiere:null,prixUsinage:10160,note:'FOYART'},
+  {l:1000,w:600,h:300,prixMatiere:null,prixUsinage:9400,note:null},
+];
+
+/* Prix moyen au m³ de l'abaque d'usinage (prix usinage / volume de chaque bloc, moyenné) —
+   valeur par défaut utilisée pour chiffrer l'usinage de la matrice et du poinçon à partir
+   de leur seul volume. */
+function abaqueMoyennePrixM3(){
+  const vals = ABAQUE_USINAGE.map(a=>{ const v=a.l*a.w*a.h*1e-9; return v>0 ? a.prixUsinage/v : 0; }).filter(v=>v>0);
+  return vals.length ? vals.reduce((s,v)=>s+v,0)/vals.length : 0;
+}
+
+let embOutilEditing = null;
+let embOutilWireframe = null; // polylignes 3D de la pièce chargée (fil de fer), non persisté
+
+function renderEmbOutil(){
+  const view = document.getElementById('view');
+  if(embOutilEditing){ renderEmbOutilForm(); return; }
+  view.innerHTML = `
+    <header class="page">
+      <div>
+        <div class="eyebrow">Emboutissage</div>
+        <h1>Outillage</h1>
+        <div class="lede">Dimensionnement de l'outil (matrice / poinçon / serre-flan) et coût de fabrication — matière + main d'oeuvre.</div>
+      </div>
+      <button class="btn primary" id="emb-outil-new">+ Nouvel outil</button>
+    </header>
+
+    ${embOutils.length ? `
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Désignation</th><th>Pièce (L×l×h)</th><th>Matière outil</th><th>Total MAIN G</th><th>Total MAIN D</th><th>Modifié le</th><th></th></tr></thead>
+          <tbody>
+            ${embOutils.map(o=>{
+              const c = computeOutil(o);
+              return `
+              <tr>
+                <td><b>${escapeHtml(o.nom||'(sans nom)')}</b></td>
+                <td>${o.pieceLongueur}×${o.pieceLargeur}×${o.pieceHauteur} mm</td>
+                <td>${c.matiereTotal.toFixed(2)} €</td>
+                <td>${c.totalMainG.toFixed(2)} €</td>
+                <td>${c.totalMainD.toFixed(2)} €</td>
+                <td>${formatDate(o.dateModification)}</td>
+                <td class="row-actions">
+                  <button class="btn small" data-out-edit="${o.id}">Modifier</button>
+                  <button class="btn small danger" data-out-del="${o.id}">Suppr.</button>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    ` : `<div class="empty" style="padding:36px 24px;"><b>Aucun outil enregistré</b>Clique sur « Nouvel outil » pour un premier chiffrage.</div>`}
+
+    <details style="margin-top:28px;">
+      <summary style="cursor:pointer;font-family:var(--display);font-size:14px;letter-spacing:.3px;color:var(--ink-dim);">Abaque usinage outil (référence)</summary>
+      <div class="table-wrap" style="margin-top:12px;">
+        <table style="min-width:760px;">
+          <thead><tr><th>Longueur</th><th>Largeur</th><th>Hauteur</th><th>Prix matière</th><th>Prix usinage</th><th>Note</th><th>Volume (m³)</th><th>Prix usinage /m³</th><th>Nb heures usinage</th></tr></thead>
+          <tbody>
+            ${ABAQUE_USINAGE.map(a=>{
+              const vol = a.l*a.w*a.h*1e-9;
+              const prixM3 = vol>0 ? a.prixUsinage/vol : 0;
+              const heures = a.prixUsinage/85;
+              return `<tr>
+                <td>${a.l}</td><td>${a.w}</td><td>${a.h}</td><td>${a.prixMatiere!=null?a.prixMatiere+' €':'—'}</td><td>${a.prixUsinage} €</td><td>${escapeHtml(a.note||'—')}</td>
+                <td>${vol.toFixed(5)}</td><td>${Math.round(prixM3).toLocaleString('fr-FR')} €</td><td>${heures.toFixed(1)} h</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+          <tfoot><tr style="font-weight:600;"><td colspan="6">Moyenne /m³</td><td></td><td>${Math.round(abaqueMoyennePrixM3()).toLocaleString('fr-FR')} €</td><td></td></tr></tfoot>
+        </table>
+      </div>
+    </details>
+  `;
+
+  document.getElementById('emb-outil-new').onclick = ()=>{
+    embOutilEditing = Object.assign(defaultEmbOutil(), { id: uid() });
+    embOutilWireframe = null;
+    render();
+  };
+  embOutils.forEach(o=>{
+    const editBtn = document.querySelector(`[data-out-edit="${o.id}"]`);
+    if(editBtn) editBtn.onclick = ()=>{ embOutilEditing = JSON.parse(JSON.stringify(o)); embOutilWireframe = null; render(); };
+    const delBtn = document.querySelector(`[data-out-del="${o.id}"]`);
+    if(delBtn) delBtn.onclick = async ()=>{
+      if(!confirm(`Supprimer l'outil « ${o.nom||'(sans nom)'} » ?`)) return;
+      embOutils = embOutils.filter(x=>x.id!==o.id);
+      await saveEmbOutils();
+      toast('Outil supprimé');
+      render();
+    };
+  });
+}
+
+function renderEmbOutilForm(){
+  const view = document.getElementById('view');
+  const o = embOutilEditing;
+  const c = computeOutil(o);
+
+  const poidsCard = (title, L, W, H, volume, poids, coutMatiere) => `
+    <div class="result-card">
+      <div style="font-weight:600;">${title} — ${L}×${W}×${H} mm</div>
+      <div style="font-size:12px;color:var(--ink-dim);margin-top:6px;">Volume : ${volume.toFixed(5)} m³ · Poids : ${poids.toFixed(2)} kg</div>
+      <div style="font-family:var(--display);font-size:20px;margin-top:8px;">${coutMatiere.toFixed(2)} €</div>
+      <div style="font-size:12px;color:var(--ink-dim);">coût matière (poids × prix/kg)</div>
+    </div>`;
+
+  const usinageCard = (title, volume, cout, heures) => `
+    <div class="result-card">
+      <div style="font-weight:600;">${title}</div>
+      <div style="font-size:12px;color:var(--ink-dim);margin-top:6px;">Volume : ${volume.toFixed(5)} m³ · ≈ ${heures.toFixed(1)} h au tarif retenu</div>
+      <div style="font-family:var(--display);font-size:20px;margin-top:8px;">${cout.toFixed(2)} €</div>
+      <div style="font-size:12px;color:var(--ink-dim);">coût usinage (volume × prix moyen /m³)</div>
+    </div>`;
+
+  // Cellule de dimension matrice/poinçon : pré-remplie avec la valeur calculée, modifiable à la main ;
+  // un bouton ⤾ apparaît une fois modifiée pour revenir au calcul automatique.
+  const dimCell = (overrideField, overrideVal, currentVal, calcVal) => `
+    <div style="display:flex;align-items:center;gap:4px;">
+      <input type="number" data-dim-field="${overrideField}" value="${currentVal}" style="width:85px;">
+      <span style="font-size:12px;color:var(--ink-dim);">mm</span>
+      ${overrideVal!=null ? `<button class="btn ghost" data-dim-reset="${overrideField}" title="Revenir au calcul automatique (${calcVal} mm)" style="padding:2px 6px;">⤾</button>` : ''}
+    </div>`;
+
+  view.innerHTML = `
+    <header class="page">
+      <div>
+        <div class="eyebrow">Emboutissage · Outillage</div>
+        <h1>${o._fbId ? "Modifier l'outil" : "Nouvel outil"}</h1>
+        <div class="lede">Entre les dimensions de la pièce (ou charge son fichier STEP) ; les dimensions de la matrice, du poinçon et du serre-flan se déduisent automatiquement, et leur coût matière se calcule à partir de leur poids (volume × densité acier) au prix du kilo.</div>
+      </div>
+    </header>
+
+    <div class="modal" style="max-width:760px;margin:0 0 24px;box-shadow:none;">
+      <div class="field"><label>Désignation de l'outil</label><input type="text" id="eo-nom" value="${escapeHtml(o.nom)}" placeholder="Ex. FERM INF PIED AVT"></div>
+
+      <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:18px 0 10px;color:var(--ink-dim);">Dimensions de la pièce (mm)</h3>
+      <div class="field">
+        <label>Charger la pièce depuis un fichier STEP (prévoir 5 à 10/10 mm de plus par pièce)</label>
+        <input type="file" id="eo-step-file" accept=".step,.stp">
+        ${o.pieceFileName ? `<span class="hint" style="font-size:11px;color:var(--ink-dim);display:block;margin-top:4px;">Fichier chargé : ${escapeHtml(o.pieceFileName)}</span>` : ''}
+        <span class="hint" style="font-size:11px;color:var(--ink-dim);display:block;margin-top:4px;">Lecture approximative (boîte englobante à partir des points 3D) — vérifie les 3 dimensions obtenues et corrige-les si besoin.</span>
+      </div>
+      <div class="grid3">
+        <div class="field"><label>Longueur X</label><input type="number" data-ofield="pieceLongueur" value="${o.pieceLongueur}" min="0"></div>
+        <div class="field"><label>Largeur Y</label><input type="number" data-ofield="pieceLargeur" value="${o.pieceLargeur}" min="0"></div>
+        <div class="field"><label>Hauteur Z</label><input type="number" data-ofield="pieceHauteur" value="${o.pieceHauteur}" min="0"></div>
+      </div>
+      <div style="font-size:12px;color:var(--ink-dim);margin:-4px 0 4px;">Volume pièce (boîte englobante) : ${((o.pieceLongueur*o.pieceLargeur*o.pieceHauteur)/1e9).toFixed(5)} m³</div>
+
+      <div class="field" style="margin-top:14px;">
+        <label style="text-transform:none;letter-spacing:0;font-weight:500;"><input type="checkbox" id="eo-has-serreflan" ${o.hasSerreFlan!==false?'checked':''} style="width:auto;margin-right:8px;vertical-align:middle;">Un serre-flan est-il nécessaire pour cet outil ?</label>
+      </div>
+
+      <div class="field" style="margin-top:10px;">
+        <label style="text-transform:none;letter-spacing:0;font-weight:500;"><input type="checkbox" id="eo-symetrique" ${o.symetrique?'checked':''} style="width:auto;margin-right:8px;vertical-align:middle;">Outillage symétrique (produit la pièce + son symétrique en une frappe) ?</label>
+      </div>
+      ${o.symetrique ? `
+        <div class="field" style="max-width:280px;">
+          <label>Axe de symétrie</label>
+          <select id="eo-symetrie-axe">
+            <option value="X" ${o.symetrieAxe!=='Y'?'selected':''}>X (longueur)</option>
+            <option value="Y" ${o.symetrieAxe==='Y'?'selected':''}>Y (largeur)</option>
+          </select>
+        </div>
+        <div style="font-size:12px;color:var(--ink-dim);margin:-4px 0 10px;">La dimension pièce sur l'axe ${c.symAxe} est doublée puis +50 mm avant de dimensionner l'outil : ${c.symAxe==='X'?`${o.pieceLongueur} → ${c.effLongueur} mm`:`${o.pieceLargeur} → ${c.effLargeur} mm`}.</div>
+      ` : ''}
+
+      ${embOutilWireframe ? `
+        <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:18px 0 10px;color:var(--ink-dim);">Visualisation de la pièce${o.symetrique?' (en rouge : son symétrique)':''}</h3>
+        <div style="overflow-x:auto;margin-bottom:8px;">
+          <div id="step-viewer" class="dxf-viewer" style="width:100%;max-width:700px;height:420px;border:1px solid var(--line);border-radius:var(--radius);">
+            ${buildStepWireframeSvg(embOutilWireframe, o.symetrique ? mirrorStepWireframe(embOutilWireframe, o.symetrieAxe==='Y'?1:0, 50) : null)}
+            <div class="dxf-viewer-controls">
+              <button data-zoom-in title="Zoomer">+</button>
+              <button data-zoom-out title="Dézoomer">−</button>
+              <button data-zoom-reset title="Réinitialiser">⤾</button>
+            </div>
+            <div class="dxf-viewer-hint">Molette / pincement = zoom · glisser = déplacer</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--ink-dim);margin:0 0 18px;">Visualisation filaire approximative reconstruite depuis le fichier STEP (projection 2D sur les deux plus grandes dimensions) — pas un rendu solide, à vérifier.</div>
+      ` : ''}
+
+      <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:18px 0 10px;color:var(--ink-dim);">Dimensions de l'outil (calculées — modifiables)</h3>
+      <div style="font-size:12px;color:var(--ink-dim);margin-bottom:8px;">La matrice et le poinçon sont pré-remplis automatiquement à partir de la pièce ; corrige librement les valeurs si besoin, ou reviens au calcul automatique avec ⤾.</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th>Matrice</th><th>Poinçon</th>${c.hasSerreFlan?'<th>Serre-flan</th>':''}</tr></thead>
+          <tbody>
+            <tr>
+              <td>Longueur</td>
+              <td>${dimCell('matriceLOverride', o.matriceLOverride, c.matriceL, c.matriceLCalc)}</td>
+              <td>${dimCell('poinconLOverride', o.poinconLOverride, c.poinconL, c.poinconLCalc)}</td>
+              ${c.hasSerreFlan?`<td>${c.serreFlanL} mm</td>`:''}
+            </tr>
+            <tr>
+              <td>Largeur</td>
+              <td>${dimCell('matriceWOverride', o.matriceWOverride, c.matriceW, c.matriceWCalc)}</td>
+              <td>${dimCell('poinconWOverride', o.poinconWOverride, c.poinconW, c.poinconWCalc)}</td>
+              ${c.hasSerreFlan?`<td>${c.serreFlanW} mm</td>`:''}
+            </tr>
+            <tr>
+              <td>Hauteur</td>
+              <td>${dimCell('matriceHOverride', o.matriceHOverride, c.matriceH, c.matriceHCalc)}</td>
+              <td>${dimCell('poinconHOverride', o.poinconHOverride, c.poinconH, c.poinconHCalc)}</td>
+              ${c.hasSerreFlan?`<td>${c.serreFlanH} mm (fixe)</td>`:''}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:18px 0 10px;color:var(--ink-dim);">Coût matière — poids × prix au kilo</h3>
+      <div class="field" style="max-width:280px;">
+        <label>Prix du kilo (42CMD8)</label>
+        <input type="number" step="0.01" id="eo-prix-kg" value="${c.prixKg}" min="0">
+      </div>
+      <div class="grid3">
+        ${poidsCard('Matrice', c.matriceL, c.matriceW, c.matriceH, c.matriceVolume, c.matricePoids, c.matriceCoutMatiere)}
+        ${poidsCard('Poinçon', c.poinconL, c.poinconW, c.poinconH, c.poinconVolume, c.poinconPoids, c.poinconCoutMatiere)}
+        ${c.hasSerreFlan ? poidsCard('Serre-flan', c.serreFlanL, c.serreFlanW, c.serreFlanH, c.serreFlanVolume, c.serreFlanPoids, c.serreFlanCoutMatiere) : ''}
+      </div>
+      <div class="result-card" style="max-width:260px;margin-top:4px;"><div style="font-family:var(--display);font-size:18px;">${c.matiereTotal.toFixed(2)} €</div><div style="font-size:12px;color:var(--ink-dim);margin-top:4px;">total matière (poids × ${c.prixKg} €/kg)</div></div>
+
+      <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:18px 0 10px;color:var(--ink-dim);">Coût usinage matrice &amp; poinçon — volume × prix moyen au m³</h3>
+      <div class="field" style="max-width:280px;">
+        <label>Prix moyen au m³ (abaque usinage, par défaut)</label>
+        <input type="number" step="1" id="eo-prix-usinage-m3" value="${Math.round(c.prixUsinageM3)}" min="0">
+      </div>
+      <div class="grid2">
+        ${usinageCard('Matrice', c.matriceVolume, c.matriceCoutUsinage, c.matriceHeuresUsinageG)}
+        ${usinageCard('Poinçon', c.poinconVolume, c.poinconCoutUsinage, c.poinconHeuresUsinageG)}
+      </div>
+      <div style="font-size:12px;color:var(--ink-dim);margin-top:8px;">Ce temps d'usinage (${c.heuresUsinageAutoG.toFixed(1)} h au tarif MAIN G, ${c.heuresUsinageAutoD.toFixed(1)} h au tarif MAIN D) alimente automatiquement la ligne « Usinage » ci-dessous, tant qu'elle n'est pas modifiée à la main.</div>
+
+      <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:22px 0 10px;color:var(--ink-dim);">Main d'oeuvre de fabrication</h3>
+      <div style="font-size:12px;color:var(--ink-dim);margin-bottom:8px;">Décoche une opération si elle ne s'applique pas à cet outil. Le temps d'« Usinage » reprend par défaut le nombre d'heures de l'abaque pour le bloc matrice le plus proche — modifiable.</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Inclus</th><th>Opération</th><th>MAIN G — heures</th><th>MAIN G — €/h</th><th>MAIN G — total</th><th>MAIN D — heures</th><th>MAIN D — €/h</th><th>MAIN D — total</th><th></th></tr></thead>
+          <tbody>
+            ${c.rows.map((r,i)=>`
+              <tr ${r.enabled===false?'style="opacity:.5;"':''}>
+                <td><input type="checkbox" data-mo-field="enabled" data-mo-idx="${i}" ${r.enabled!==false?'checked':''} style="width:auto;"></td>
+                <td><input type="text" data-mo-field="label" data-mo-idx="${i}" value="${escapeHtml(r.label)}" style="width:170px;"></td>
+                <td><input type="number" step="0.5" data-mo-field="hg" data-mo-idx="${i}" value="${r.hg}" style="width:70px;"></td>
+                <td><input type="number" data-mo-field="chg" data-mo-idx="${i}" value="${r.chg}" style="width:70px;"></td>
+                <td>${r.totG.toFixed(2)} €</td>
+                <td><input type="number" step="0.5" data-mo-field="hd" data-mo-idx="${i}" value="${r.hd}" style="width:70px;"></td>
+                <td><input type="number" data-mo-field="chd" data-mo-idx="${i}" value="${r.chd}" style="width:70px;"></td>
+                <td>${r.totD.toFixed(2)} €</td>
+                <td><button class="btn ghost" data-mo-del="${i}" title="Supprimer la ligne">✕</button></td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-actions" style="justify-content:flex-start;margin-top:10px;">
+        <button class="btn small" id="eo-add-row">+ Ajouter une ligne</button>
+      </div>
+
+      <div class="grid2" style="margin-top:16px;">
+        <div class="result-card"><div style="font-family:var(--display);font-size:22px;">${c.totalMainG.toFixed(2)} €</div><div style="font-size:12px;color:var(--ink-dim);margin-top:4px;">total outil — MAIN G (matière + main d'oeuvre)</div></div>
+        <div class="result-card"><div style="font-family:var(--display);font-size:22px;">${c.totalMainD.toFixed(2)} €</div><div style="font-size:12px;color:var(--ink-dim);margin-top:4px;">total outil — MAIN D (matière + main d'oeuvre)</div></div>
+      </div>
+
+      <div class="modal-actions" style="justify-content:flex-start;">
+        <button class="btn primary" id="eo-save">Enregistrer l'outil</button>
+        <button class="btn" id="eo-cancel">Annuler</button>
+      </div>
+    </div>
+  `;
+
+  document.querySelectorAll('[data-ofield]').forEach(inp=>{
+    inp.onchange = (e)=>{
+      o[e.target.dataset.ofield] = parseFloat(e.target.value) || 0;
+      // La pièce change : on repart des dimensions calculées pour la matrice/le poinçon.
+      o.matriceLOverride = o.matriceWOverride = o.matriceHOverride = null;
+      o.poinconLOverride = o.poinconWOverride = o.poinconHOverride = null;
+      renderEmbOutilForm();
+    };
+  });
+  document.querySelectorAll('[data-dim-field]').forEach(inp=>{
+    inp.onchange = (e)=>{
+      o[e.target.dataset.dimField] = parseFloat(e.target.value) || 0;
+      renderEmbOutilForm();
+    };
+  });
+  document.querySelectorAll('[data-dim-reset]').forEach(btn=>{
+    btn.onclick = ()=>{
+      o[btn.dataset.dimReset] = null;
+      renderEmbOutilForm();
+    };
+  });
+  document.getElementById('eo-nom').onchange = (e)=>{ o.nom = e.target.value; };
+  document.getElementById('eo-has-serreflan').onchange = (e)=>{ o.hasSerreFlan = e.target.checked; renderEmbOutilForm(); };
+  document.getElementById('eo-prix-kg').onchange = (e)=>{ o.prixKgMatiere = parseFloat(e.target.value) || 0; renderEmbOutilForm(); };
+  document.getElementById('eo-prix-usinage-m3').onchange = (e)=>{ o.prixUsinageM3 = parseFloat(e.target.value) || 0; renderEmbOutilForm(); };
+  document.getElementById('eo-symetrique').onchange = (e)=>{
+    o.symetrique = e.target.checked;
+    o.matriceLOverride = o.matriceWOverride = o.matriceHOverride = null;
+    o.poinconLOverride = o.poinconWOverride = o.poinconHOverride = null;
+    renderEmbOutilForm();
+  };
+  const symAxeSel = document.getElementById('eo-symetrie-axe');
+  if(symAxeSel) symAxeSel.onchange = (e)=>{
+    o.symetrieAxe = e.target.value;
+    o.matriceLOverride = o.matriceWOverride = o.matriceHOverride = null;
+    o.poinconLOverride = o.poinconWOverride = o.poinconHOverride = null;
+    renderEmbOutilForm();
+  };
+
+  document.querySelectorAll('[data-mo-field]').forEach(inp=>{
+    inp.onchange = (e)=>{
+      const idx = parseInt(e.target.dataset.moIdx);
+      const f = e.target.dataset.moField;
+      if(f==='label') o.moRows[idx][f] = e.target.value;
+      else if(f==='enabled') o.moRows[idx][f] = e.target.checked;
+      else o.moRows[idx][f] = parseFloat(e.target.value)||0;
+      renderEmbOutilForm();
+    };
+  });
+  document.querySelectorAll('[data-mo-del]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const idx = parseInt(btn.dataset.moDel);
+      o.moRows.splice(idx,1);
+      renderEmbOutilForm();
+    };
+  });
+  document.getElementById('eo-add-row').onclick = ()=>{
+    o.moRows.push({ key:'', label:'', enabled:true, hg:0, chg:0, hd:0, chd:0 });
+    renderEmbOutilForm();
+  };
+
+  document.getElementById('eo-step-file').onchange = async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    try{
+      const text = await file.text();
+      const bbox = parseStepBoundingBox3D(text);
+      o.pieceLongueur = bbox.longueur; o.pieceLargeur = bbox.largeur; o.pieceHauteur = bbox.hauteur;
+      o.pieceFileName = file.name;
+      o.nom = file.name.replace(/\.(stp|step)$/i, '');
+      o.matriceLOverride = o.matriceWOverride = o.matriceHOverride = null;
+      o.poinconLOverride = o.poinconWOverride = o.poinconHOverride = null;
+      try{ embOutilWireframe = parseStepWireframe(text); }catch(werr){ console.error(werr); embOutilWireframe = null; }
+      toast(`Pièce lue : ${bbox.longueur} × ${bbox.largeur} × ${bbox.hauteur} mm (volume ≈ ${bbox.volume.toFixed(5)} m³)`);
+      renderEmbOutilForm();
+    }catch(err){
+      console.error(err);
+      toast('Impossible de lire ce fichier : ' + err.message);
+    }
+  };
+
+  document.getElementById('eo-save').onclick = async ()=>{
+    if(!o.nom || !o.nom.trim()){ toast("Indique une désignation pour l'outil"); return; }
+    if(!o.dateCreation) o.dateCreation = new Date().toISOString();
+    const idx = embOutils.findIndex(x=>x.id===o.id);
+    if(idx>=0) embOutils[idx] = o; else embOutils.push(o);
+    await saveEmbOutils();
+    toast('Outil enregistré');
+    embOutilEditing = null;
+    embOutilWireframe = null;
+    render();
+  };
+  document.getElementById('eo-cancel').onclick = ()=>{ embOutilEditing = null; embOutilWireframe = null; render(); };
+
+  if(embOutilWireframe){ attachDxfZoomPan('step-viewer'); }
 }
 
 if('serviceWorker' in navigator){
