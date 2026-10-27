@@ -65,6 +65,7 @@
   }
   .brand{font-family:var(--display);font-weight:600;font-size:20px;letter-spacing:.5px;line-height:1.15;color:var(--ink);}
   .brand span{color:var(--accent);}
+  .app-version{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.5px;margin-top:4px;}
   .brand-sub{font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);letter-spacing:1px;margin-top:6px;text-transform:uppercase;}
   nav{margin-top:34px;display:flex;flex-direction:column;gap:4px;}
   .nav-btn{
@@ -323,6 +324,7 @@
 <div id="sidebar" style="display:none">
   <div class="brand">TÔLE<span>RIE</span></div>
   <div class="brand-sub">Gestion de stock</div>
+  <div class="app-version" id="app-version-side"></div>
   <nav>
     <div class="nav-group">
       <div class="nav-group-title">Rangement tôlerie</div>
@@ -365,6 +367,14 @@ let embPieces = [];
 let embOutils = [];
 let settings = { paletteStart: 1, defaultLongueur: 1000, defaultLargeur: 1000, defaultEpaisseur: 1, defaultMatiere: 'Acier', defaultSeuil: 1 };
 let currentTab = 'inventaire';
+
+/* Version affichée dans l'application (majeure.mineure) — à incrémenter à chaque livraison :
+   majeure = nouveau module / refonte, mineure = ajout ou correction dans un module existant.
+   v3.0 Firebase · v3.1 palettes & paramètres · v3.2 imbrication DXF/STEP
+   v4.0 Emboutissage (Pièce/Outillage) · v4.1 viewer STEP, symétrie, dimensions modifiables
+   v4.2 Pièce : données, détourage, matière, prise en charge · v4.3 Découpe laser : historique des temps réels */
+const APP_VERSION = '4.3';
+const APP_VERSION_DATE = '27/10/2026';
 
 /* ---------------------------------------------------------
    🔧 CONFIGURATION — collez ici les valeurs de votre projet Firebase
@@ -2279,11 +2289,13 @@ async function startApp(user){
   document.getElementById('ruler').style.display = '';
   document.getElementById('sidebar').style.display = '';
   document.getElementById('main-view').style.display = '';
+  document.getElementById('app-version-side').textContent = `v${APP_VERSION} · ${APP_VERSION_DATE}`;
   document.getElementById('sidebar-foot').innerHTML = `
     <div class="user-chip">
       <span class="dot"></span>${escapeHtml(user.email)}
       <button id="logout-btn">Se déconnecter</button>
-    </div>`;
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--ink-dim);margin-top:8px;">Version ${APP_VERSION} · ${APP_VERSION_DATE}</div>`;
   document.getElementById('logout-btn').addEventListener('click', ()=> auth.signOut());
   document.getElementById('view').innerHTML = `<div class="lede">Chargement du stock…</div>`;
   await loadData();
@@ -2313,7 +2325,7 @@ function authGateHtml(mode, error){
 function renderAuthGate(mode, error){
   const gate = document.getElementById('auth-gate');
   gate.style.display = 'flex';
-  gate.innerHTML = authGateHtml(mode, error);
+  gate.innerHTML = authGateHtml(mode, error) + `<div style="position:fixed;bottom:12px;left:0;right:0;text-align:center;font-family:var(--mono);font-size:10px;color:var(--ink-dim);">Version ${APP_VERSION} · ${APP_VERSION_DATE}</div>`;
   document.getElementById('auth-switch-link').addEventListener('click', ()=>{
     renderAuthGate(mode === 'signup' ? 'login' : 'signup');
   });
