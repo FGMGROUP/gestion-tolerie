@@ -418,7 +418,8 @@ function generateRef(matiere, nuance, epaisseur, longueur, largeur, excludeId){
   return `${base}-${String(next).padStart(3,'0')}`;
 }
 
-let unsubToles = null, unsubZones = null, unsubSettings = null, unsubEmbPieces = null, unsubEmbOutils = null;
+let unsubToles = null, unsubZones = null, unsubSettings = null, unsubEmbPieces = null, unsubEmbOutils = null, unsubLaserHist = null;
+let laserHist = []; // historique des découpes laser réelles (base d'apprentissage)
 
 function detachListeners(){
   if(unsubToles){ unsubToles(); unsubToles = null; }
@@ -426,12 +427,13 @@ function detachListeners(){
   if(unsubSettings){ unsubSettings(); unsubSettings = null; }
   if(unsubEmbPieces){ unsubEmbPieces(); unsubEmbPieces = null; }
   if(unsubEmbOutils){ unsubEmbOutils(); unsubEmbOutils = null; }
+  if(unsubLaserHist){ unsubLaserHist(); unsubLaserHist = null; }
 }
 
 async function loadData(){
   await new Promise((resolve)=>{
     let done = 0;
-    const TOTAL = 5;
+    const TOTAL = 6;
     const checkDone = ()=>{ done++; if(done>=TOTAL) resolve(); };
 
     unsubToles = db.collection('toles').onSnapshot(snap=>{
@@ -488,7 +490,23 @@ async function loadData(){
       if(done>=TOTAL) renderLiveSafe();
       checkDone();
     }, e=>{ console.error(e); embOutils = []; checkDone(); });
+
+    unsubLaserHist = db.collection('laserHistorique').onSnapshot(snap=>{
+      laserHist = snap.docs.map(d=> Object.assign({}, d.data(), { _fbId: d.id }))
+        .sort((a,b)=> String(b.date||'').localeCompare(String(a.date||'')));
+      if(done>=TOTAL && currentTab === 'decoupelaser') renderDecoupeLaser();
+      checkDone();
+    }, e=>{ console.error(e); laserHist = []; checkDone(); });
   });
+}
+
+async function addLaserEntry(entry){
+  try{ await db.collection('laserHistorique').add(entry); return true; }
+  catch(e){ console.error(e); toast('Erreur d\'enregistrement Firebase — vérifiez la console'); return false; }
+}
+async function deleteLaserEntry(fbId){
+  try{ await db.collection('laserHistorique').doc(fbId).delete(); }
+  catch(e){ console.error(e); toast('Suppression impossible — vérifiez la console'); }
 }
 
 async function saveSettings(){
@@ -1801,6 +1819,23 @@ function fmtMin(min){
   return `${m} min ${String(s).padStart(2,'0')} s`;
 }
 
+/* Correction apprise : rapport moyen temps réel / temps estimé, par matière+épaisseur
+   (sinon global). Volontairement simple : avec peu de données, c'est plus fiable qu'un réseau de neurones. */
+function laserLearnedRatio(matiere, epaisseur){
+  const valid = laserHist.filter(h=> h.tempsEstimeMin>0 && h.tempsReelMin>0);
+  const mean = arr => arr.reduce((s,h)=>s+h.tempsReelMin/h.tempsEstimeMin,0)/arr.length;
+  const same = valid.filter(h=> h.matiere===matiere && Number(h.epaisseur)===Number(epaisseur));
+  if(same.length>=3) return { ratio: mean(same), n: same.length, scope: `${matiere} ${epaisseur} mm` };
+  if(valid.length>=3) return { ratio: mean(valid), n: valid.length, scope: 'toutes matières' };
+  return null;
+}
+
+function laserHistCsv(){
+  const cols = ['date','piece','fichier','matiere','epaisseur','vitesse','tempsPercage','longueurCoupeMm','percages','largeurMm','hauteurMm','qte','tempsEstimeMin','tempsReelMin'];
+  const esc = v => `"${String(v==null?'':v).replace(/"/g,'""')}"`;
+  return [cols.join(';')].concat(laserHist.map(h=>cols.map(c=>esc(h[c])).join(';'))).join('\n');
+}
+
 function renderDecoupeLaser(){
   const view = document.getElementById('view');
   const calc = laserCompute();
@@ -1855,6 +1890,21 @@ function renderDecoupeLaser(){
           <div style="font-size:12px;color:var(--ink-dim);">Temps total estimé</div>
           <div style="font-family:var(--display);font-size:30px;color:var(--accent);margin-top:4px;">${fmtMin(calc.tempsTotalMin)}</div>
         </div>
+        ${(()=>{
+          const L = laserLearnedRatio(laserParams.matiere, laserParams.epaisseur);
+          return L ? `<div class="result-card" style="text-align:center;margin-top:12px;">
+            <div style="font-size:12px;color:var(--ink-dim);">Temps corrigé d'après ton historique (×${L.ratio.toFixed(2)} · ${L.n} découpes · ${escapeHtml(L.scope)})</div>
+            <div style="font-family:var(--display);font-size:26px;margin-top:4px;">${fmtMin(calc.tempsTotalMin*L.ratio)}</div>
+          </div>` : `<div style="font-size:12px;color:var(--ink-dim);margin-top:12px;text-align:center;">Enregistre au moins 3 découpes réelles ci-dessous pour obtenir un temps corrigé.</div>`;
+        })()}
+
+        <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:22px 0 10px;color:var(--ink-dim);">Enregistrer la découpe réelle</h3>
+        <div class="grid3">
+          <div class="field"><label>Temps réel mesuré (min)</label><input type="number" step="0.1" min="0" id="laser-hist-reel"></div>
+          <div class="field"><label>Pièce / repère</label><input type="text" id="laser-hist-piece" value="${escapeHtml((laserFileName||'').replace(/\.dxf$/i,''))}"></div>
+          <div class="field"><label>Quantité découpée</label><input type="number" min="1" id="laser-hist-qte" value="1"></div>
+        </div>
+        <div class="modal-actions" style="justify-content:flex-start;margin-top:0;"><button class="btn primary" id="laser-hist-save">Ajouter à l'historique</button></div>
         <div style="overflow-x:auto;margin-top:16px;">
           <div id="dxf-viewer-laser" class="dxf-viewer" style="width:100%;max-width:600px;height:420px;border:1px solid var(--line);border-radius:var(--radius);">
             ${buildDxfSvg(laserResult.entities, laserResult.bbox)}
@@ -1868,6 +1918,26 @@ function renderDecoupeLaser(){
         </div>
       </div>
     ` : `<div class="empty" style="padding:36px 24px;"><b>Aucun fichier chargé</b>Charge un DXF pour voir l'estimation du temps de découpe.</div>`}
+
+    <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:28px 0 8px;color:var(--ink-dim);">Historique des découpes réelles (${laserHist.length})</h3>
+    <div style="font-size:12px;color:var(--ink-dim);margin-bottom:10px;max-width:640px;">Chaque découpe enregistrée constitue la base d'apprentissage pour prédire temps et prix. Avec quelques dizaines de cas, une correction simple (rapport réel/estimé) suffit ; un modèle plus poussé (deep learning) ne devient utile qu'avec plusieurs centaines de découpes — exporte le CSV pour l'entraîner hors de l'application.</div>
+    ${laserHist.length ? `
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Pièce</th><th>Matière</th><th>Ép.</th><th>Coupe (m)</th><th>Perçages</th><th>Estimé</th><th>Réel</th><th>Réel/estimé</th><th></th></tr></thead>
+          <tbody>
+            ${laserHist.slice(0,50).map(h=>`<tr>
+              <td>${formatDate(h.date)}</td><td>${escapeHtml(h.piece||h.fichier||'')}</td><td>${escapeHtml(h.matiere||'')}</td><td>${h.epaisseur} mm</td>
+              <td>${(h.longueurCoupeMm/1000).toFixed(2)}</td><td>${h.percages}</td>
+              <td>${Number(h.tempsEstimeMin).toFixed(1)} min</td><td>${Number(h.tempsReelMin).toFixed(1)} min</td>
+              <td>${h.tempsEstimeMin>0 ? '×'+(h.tempsReelMin/h.tempsEstimeMin).toFixed(2) : '—'}</td>
+              <td class="row-actions"><button class="btn small danger" data-laser-del="${h._fbId}">Suppr.</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-actions" style="justify-content:flex-start;"><button class="btn small" id="laser-hist-csv">Exporter en CSV</button></div>
+    ` : `<div class="empty" style="padding:24px;max-width:640px;"><b>Historique vide</b>Charge un DXF, découpe la pièce, puis saisis le temps réel pour commencer à constituer la base.</div>`}
   `;
 
   document.getElementById('laser-matiere').onchange = (e)=>{
@@ -1886,6 +1956,36 @@ function renderDecoupeLaser(){
   document.getElementById('laser-percage').onchange = (e)=>{ laserParams.tempsPercage = parseFloat(e.target.value)||0; renderDecoupeLaser(); };
 
   if(laserResult){ attachDxfZoomPan('dxf-viewer-laser'); }
+
+  const histSave = document.getElementById('laser-hist-save');
+  if(histSave) histSave.onclick = async ()=>{
+    const reel = parseFloat(document.getElementById('laser-hist-reel').value);
+    if(!(reel>0)){ toast('Saisis le temps réel mesuré (en minutes)'); return; }
+    const qte = Math.max(1, parseInt(document.getElementById('laser-hist-qte').value)||1);
+    const ok = await addLaserEntry({
+      date: new Date().toISOString(),
+      piece: document.getElementById('laser-hist-piece').value.trim(),
+      fichier: laserFileName,
+      matiere: laserParams.matiere, epaisseur: laserParams.epaisseur,
+      vitesse: laserParams.vitesse, tempsPercage: laserParams.tempsPercage,
+      longueurCoupeMm: Math.round(laserResult.totalLength), percages: laserResult.pierces,
+      largeurMm: Math.round(laserResult.bbox.maxX-laserResult.bbox.minX), hauteurMm: Math.round(laserResult.bbox.maxY-laserResult.bbox.minY),
+      qte,
+      // temps rapportés à une seule pièce pour que les données restent comparables
+      tempsEstimeMin: +(calc.tempsTotalMin).toFixed(3), tempsReelMin: +(reel/qte).toFixed(3)
+    });
+    if(ok) toast('Découpe ajoutée à l\'historique');
+  };
+  document.querySelectorAll('[data-laser-del]').forEach(b=>{
+    b.onclick = async ()=>{ if(confirm('Supprimer cette découpe de l\'historique ?')) await deleteLaserEntry(b.dataset.laserDel); };
+  });
+  const csvBtn = document.getElementById('laser-hist-csv');
+  if(csvBtn) csvBtn.onclick = ()=>{
+    const blob = new Blob(['\ufeff'+laserHistCsv()], { type:'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'historique-decoupe-laser.csv'; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  };
 
   document.getElementById('laser-file').onchange = async (e)=>{
     const file = e.target.files[0];
@@ -2328,15 +2428,29 @@ function defaultEmbPiece(){
     coutSousTraitance: 0,
     coutDivers: 0,
     margeAppliquee: 0.25,
+    matiere: 'Acier',
+    prixKgMatiere: 3,
+    longueurDetourage: null, // null = calculée (contour du flanc + trous), modifiable à la main
+    priseEnCharge: 0, // outillage + programme : valeur fixe, affichée en bas de devis, hors coût pièce
     pieceFileName: '',
     dateCreation: null, dateModification: null
   };
 }
 
+/* Matières proposées : densité (kg/dm³) et prix au kilo par défaut (€) */
+const EMB_MATIERES = {
+  'Acier': { densite: 8, prixKg: 3 },
+  'Alu':   { densite: 2.7, prixKg: 5 },
+  'Inox':  { densite: 8, prixKg: 6 },
+};
+
 function computePiece(p){
-  const poidsPiece = (p.longueurFlanc * p.largeurFlanc) * p.epaisseur * (8/1000000);
-  const longueurCoupe = (p.longueurFlanc + p.largeurFlanc + (p.nbDecoupes/2*3.2*p.diametreDecoupes)) * 2;
+  const mat = EMB_MATIERES[p.matiere] || EMB_MATIERES['Acier'];
+  const poidsPiece = (p.longueurFlanc * p.largeurFlanc) * p.epaisseur * (mat.densite/1000000);
+  const longueurCoupeAuto = (p.longueurFlanc + p.largeurFlanc + (p.nbDecoupes/2*3.2*p.diametreDecoupes)) * 2;
+  const longueurCoupe = (p.longueurDetourage!=null && p.longueurDetourage>0) ? p.longueurDetourage : longueurCoupeAuto;
   const tempsDecoupeMin = p.vitesseLaser>0 ? longueurCoupe / p.vitesseLaser : 0;
+  const tempsDecoupeLotMin = tempsDecoupeMin * p.qteLancement;
   const tempsDebitMin = 0.5 + (p.vitesseDebit>0 ? p.hauteurCoupeDebit / p.vitesseDebit : 0);
 
   const tLaserH = longueurCoupe===0 ? 0 : (15 + tempsDecoupeMin*p.qteLancement)/60;
@@ -2359,13 +2473,17 @@ function computePiece(p){
   const poidsLot = poidsPiece*p.qteLancement;
   const coutLogistique = poidsLot < 30 ? 25 : (poidsLot < 100 ? poidsLot*0.5 : poidsLot*0.35);
 
-  const coutGlobal = (p.coutAdmin||0) + (p.coutAccessoire||0) + (p.coutMatiere||0) + coutLaser + coutDebit + coutEmbFab + coutPliage
+  // Matière : calculée (poids du lot × prix/kg) tant qu'aucun montant n'est saisi à la main
+  const coutMatiereAuto = poidsLot * (p.prixKgMatiere!=null ? p.prixKgMatiere : mat.prixKg);
+  const coutMatiere = (p.coutMatiere>0) ? p.coutMatiere : coutMatiereAuto;
+
+  const coutGlobal = (p.coutAdmin||0) + (p.coutAccessoire||0) + coutMatiere + coutLaser + coutDebit + coutEmbFab + coutPliage
     + coutRepriseMontage + coutLaser5Ax + coutCondition + (p.coutEmballage||0) + (p.coutSousTraitance||0) + coutLogistique + (p.coutDivers||0);
   const coutPieceUnit = p.qteLancement>0 ? coutGlobal/p.qteLancement : 0;
   const prixVente = coutPieceUnit + coutPieceUnit*(p.margeAppliquee||0);
   const prixVenteGlobal = prixVente*p.qteLancement;
 
-  return { poidsPiece, longueurCoupe, tempsDecoupeMin, tempsDebitMin,
+  return { poidsPiece, longueurCoupe, longueurCoupeAuto, tempsDecoupeMin, tempsDecoupeLotMin, tempsDebitMin, coutMatiere, coutMatiereAuto,
     tLaserH, tDebitH, tEmbH, tPliageH, tMontageH, tLaser5axH, tCondH, tempsTotalH,
     coutLaser, coutDebit, coutEmbFab, coutPliage, coutRepriseMontage, coutLaser5Ax, coutCondition, coutLogistique,
     coutGlobal, coutPieceUnit, prixVente, prixVenteGlobal };
@@ -2434,7 +2552,7 @@ function renderEmbPiece(){
     ${embPieces.length ? `
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Désignation</th><th>Qté lancement</th><th>Poids pièce</th><th>Coût pièce</th><th>Prix de vente</th><th>Prix vente lot</th><th>Modifié le</th><th></th></tr></thead>
+          <thead><tr><th>Désignation</th><th>Qté lancement</th><th>Poids pièce</th><th>Coût pièce</th><th>Prix de vente</th><th>Prix vente lot</th><th>Prise en charge</th><th>Modifié le</th><th></th></tr></thead>
           <tbody>
             ${embPieces.map(p=>{
               const c = computePiece(p);
@@ -2446,6 +2564,7 @@ function renderEmbPiece(){
                 <td>${c.coutPieceUnit.toFixed(2)} €</td>
                 <td>${c.prixVente.toFixed(2)} €</td>
                 <td>${c.prixVenteGlobal.toFixed(2)} €</td>
+                <td>${(p.priseEnCharge||0).toFixed(2)} €</td>
                 <td>${formatDate(p.dateModification)}</td>
                 <td class="row-actions">
                   <button class="btn small" data-emb-edit="${p.id}">Modifier</button>
@@ -2540,19 +2659,31 @@ function renderEmbPieceForm(){
 
       <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:18px 0 10px;color:var(--ink-dim);">Données pièce</h3>
       <div class="grid3">
-        ${field('Qté de lancement','qteLancement',{min:1})}
+        ${field('Quantité','qteLancement',{min:1})}
+        <div class="field">
+          <label>Matière</label>
+          <select id="ep-matiere">
+            ${Object.keys(EMB_MATIERES).map(m=>`<option value="${m}" ${p.matiere===m?'selected':''}>${m}</option>`).join('')}
+          </select>
+        </div>
         ${field('Épaisseur (mm)','epaisseur',{step:0.1,min:0})}
-        ${field('Nb de pli','nbPli',{min:0})}
       </div>
       <div class="grid3">
-        ${field('Longueur flanc (mm)','longueurFlanc',{min:0})}
-        ${field('Largeur flanc (mm)','largeurFlanc',{min:0})}
-        ${field('Nb de soudure par points','nbSoudures',{min:0})}
+        ${field('Longueur (mm)','longueurFlanc',{min:0})}
+        ${field('Largeur (mm)','largeurFlanc',{min:0})}
+        <div class="field">
+          <label>Longueur totale du détourage (mm)</label>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <input type="number" id="ep-detourage" value="${Math.round(c.longueurCoupe)}" min="0">
+            ${p.longueurDetourage!=null ? `<button class="btn ghost" id="ep-detourage-reset" title="Revenir au calcul automatique (${Math.round(c.longueurCoupeAuto)} mm)" style="padding:2px 6px;">⤾</button>` : ''}
+          </div>
+        </div>
       </div>
       <div class="grid3">
-        ${field('Nb de découpes','nbDecoupes',{min:0})}
-        ${field('Ø moyen des découpes (mm)','diametreDecoupes',{step:0.1,min:0})}
+        ${field('Nombre de trous','nbDecoupes',{min:0})}
+        ${field('Ø moyen des trous (mm)','diametreDecoupes',{step:0.1,min:0})}
       </div>
+      <div style="font-size:11px;color:var(--ink-dim);margin:-2px 0 4px;">Le détourage est calculé automatiquement (contour du flanc + trous) tant que tu ne le modifies pas ; saisis la valeur réelle (ex. lue sur la CAO) pour la remplacer.</div>
 
       <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:18px 0 10px;color:var(--ink-dim);">Laser &amp; débit</h3>
       <div class="grid3">
@@ -2560,8 +2691,16 @@ function renderEmbPieceForm(){
         ${field('Vitesse de découpe débit (mm/min)','vitesseDebit',{min:1})}
         ${field('Hauteur de coupe débit (mm)','hauteurCoupeDebit',{min:0})}
       </div>
+      <div class="result-card" style="margin-top:6px;">
+        <div style="font-size:12px;color:var(--ink-dim);">Temps de découpe laser de la pièce (${Math.round(c.longueurCoupe)} mm à ${p.vitesseLaser} mm/min)</div>
+        <div style="font-family:var(--display);font-size:20px;margin-top:4px;">${c.tempsDecoupeMin.toFixed(2)} min <span style="font-size:13px;color:var(--ink-dim);">/ pièce</span> · ${c.tempsDecoupeLotMin.toFixed(1)} min <span style="font-size:13px;color:var(--ink-dim);">pour le lot de ${p.qteLancement}</span></div>
+      </div>
 
       <h3 style="font-family:var(--display);font-size:14px;letter-spacing:.3px;margin:18px 0 10px;color:var(--ink-dim);">Emboutissage, pliage, montage</h3>
+      <div class="grid3">
+        ${field('Nb de pli','nbPli',{min:0})}
+        ${field('Nb de soudure par points','nbSoudures',{min:0})}
+      </div>
       <div class="grid3">
         ${field('Emboutissage (min)','tempsEmboutissageMin',{step:0.1,min:0})}
         ${field('Pliage (min)','tempsPliageMin',{step:0.1,min:0})}
@@ -2576,8 +2715,12 @@ function renderEmbPieceForm(){
       <div class="grid3">
         ${field('Administratif / chiffrage (€)','coutAdmin',{min:0})}
         ${field('Accessoire / quincaillerie (€)','coutAccessoire',{min:0})}
-        ${field('Matière (€) — Acier 3€ / Alu 5€ / Inox 6€ le kg','coutMatiere',{step:0.01,min:0})}
+        ${field('Prix matière au kilo (€) — Acier 3 / Alu 5 / Inox 6','prixKgMatiere',{step:0.1,min:0})}
       </div>
+      <div class="grid3">
+        ${field('Matière — montant imposé (€), 0 = calculé','coutMatiere',{step:0.01,min:0})}
+      </div>
+      <div style="font-size:11px;color:var(--ink-dim);margin:-2px 0 8px;">Matière calculée : ${c.poidsPiece.toFixed(3)} kg/pièce × ${p.qteLancement} × ${p.prixKgMatiere} €/kg = ${c.coutMatiereAuto.toFixed(2)} € (utilisée tant que le montant imposé est à 0).</div>
       <div class="grid3">
         ${field('Emballage (€)','coutEmballage',{min:0})}
         ${field('Sous-traitance (€)','coutSousTraitance',{min:0})}
@@ -2611,7 +2754,7 @@ function renderEmbPieceForm(){
           <tbody>
             <tr><td>Administratif / chiffrage</td><td>${p.coutAdmin.toFixed(2)} €</td></tr>
             <tr><td>Accessoire / quincaillerie</td><td>${p.coutAccessoire.toFixed(2)} €</td></tr>
-            <tr><td>Matière</td><td>${p.coutMatiere.toFixed(2)} €</td></tr>
+            <tr><td>Matière (${escapeHtml(p.matiere||'Acier')})</td><td>${c.coutMatiere.toFixed(2)} €</td></tr>
             <tr><td>Laser (150€/h)</td><td>${c.coutLaser.toFixed(2)} €</td></tr>
             <tr><td>Débit</td><td>${c.coutDebit.toFixed(2)} €</td></tr>
             <tr><td>Emboutissage</td><td>${c.coutEmbFab.toFixed(2)} €</td></tr>
@@ -2638,6 +2781,13 @@ function renderEmbPieceForm(){
         <div style="font-size:12px;color:var(--ink-dim);margin-top:10px;">Prix de vente global du lot : <b style="color:var(--ink);">${c.prixVenteGlobal.toFixed(2)} €</b></div>
       </div>
 
+      <div class="result-card" style="margin-top:16px;">
+        <div style="font-weight:600;">Prise en charge — outillage + programme</div>
+        <div style="font-size:12px;color:var(--ink-dim);margin:4px 0 10px;">Montant fixe, affiché en bas de devis avec l'outillage ; il n'est <b>pas</b> intégré au coût ni au prix de vente de la pièce.</div>
+        <div class="field" style="max-width:240px;margin:0;"><label>Prise en charge (€)</label><input type="number" step="0.01" min="0" data-field="priseEnCharge" value="${p.priseEnCharge||0}"></div>
+        <div style="font-size:12px;color:var(--ink-dim);margin-top:10px;">Total devis (lot + prise en charge) : <b style="color:var(--ink);">${(c.prixVenteGlobal + (p.priseEnCharge||0)).toFixed(2)} €</b></div>
+      </div>
+
       <div class="modal-actions" style="justify-content:flex-start;">
         <button class="btn primary" id="ep-save">Enregistrer la pièce</button>
         <button class="btn" id="ep-cancel">Annuler</button>
@@ -2653,6 +2803,18 @@ function renderEmbPieceForm(){
     };
   });
   document.getElementById('ep-nom').onchange = (e)=>{ p.nom = e.target.value; };
+  document.getElementById('ep-matiere').onchange = (e)=>{
+    p.matiere = e.target.value;
+    p.prixKgMatiere = (EMB_MATIERES[p.matiere]||EMB_MATIERES['Acier']).prixKg;
+    renderEmbPieceForm();
+  };
+  document.getElementById('ep-detourage').onchange = (e)=>{
+    const v = parseFloat(e.target.value);
+    p.longueurDetourage = (v>0) ? v : null;
+    renderEmbPieceForm();
+  };
+  const detReset = document.getElementById('ep-detourage-reset');
+  if(detReset) detReset.onclick = ()=>{ p.longueurDetourage = null; renderEmbPieceForm(); };
   document.getElementById('ep-marge').onchange = (e)=>{ p.margeAppliquee = parseFloat(e.target.value)||0; renderEmbPieceForm(); };
 
   document.getElementById('ep-step-file').onchange = async (e)=>{
